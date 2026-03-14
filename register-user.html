@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - 天津数据产权登记服务平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="js/api.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .input-field {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .input-field.error {
+            border-color: #ef4444;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .role-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .role-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+        .role-card.selected {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        .step-indicator {
+            display: flex;
+            align-items: center;
+        }
+        .step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .step-dot.active {
+            background: #3b82f6;
+            color: white;
+        }
+        .step-dot.completed {
+            background: #10b981;
+            color: white;
+        }
+        .step-dot.pending {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .step-line {
+            width: 60px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 8px;
+        }
+        .step-line.completed {
+            background: #10b981;
+        }
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .toast {
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-2xl">
+            <!-- 步骤指示器 -->
+            <div class="flex justify-center mb-8">
+                <div class="step-indicator">
+                    <div class="step-dot active" id="step1Dot">1</div>
+                    <div class="step-line" id="line1"></div>
+                    <div class="step-dot pending" id="step2Dot">2</div>
+                    <div class="step-line" id="line2"></div>
+                    <div class="step-dot pending" id="step3Dot">3</div>
+                </div>
+            </div>
+
+            <!-- 标题 -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold mb-2">用户注册</h1>
+                <p class="text-gray-300">创建您的天津数据产权登记平台账号</p>
+            </div>
+
+            <!-- 步骤1: 选择角色 -->
+            <div id="step1" class="glass-card p-8 rounded-2xl fade-in">
+                <h2 class="text-xl font-bold mb-6">选择您的角色</h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="role-card glass-card p-6 rounded-xl" onclick="selectRole('data_holder')" data-role="data_holder">
+                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-bold mb-2">数据持有方</h3>
+                        <p class="text-sm text-gray-300">拥有数据资产，需要进行产权登记的个人或企业</p>
+                    </div>
+                    <div class="role-card glass-card p-6 rounded-xl" onclick="selectRole('data_user')" data-role="data_user">
+                        <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-bold mb-2">数据使用方</h3>
+                        <p class="text-sm text-gray-300">需要查询和使用已登记数据的个人或企业</p>
+                    </div>
+                </div>
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-400">已有账号？<a href="login.html" class="text-blue-400 hover:text-blue-300 underline">立即登录</a></p>
+                </div>
+            </div>
+
+            <!-- 步骤2: 填写信息 -->
+            <div id="step2" class="glass-card p-8 rounded-2xl hidden">
+                <h2 class="text-xl font-bold mb-6">填写基本信息</h2>
+                <form id="registerForm" class="space-y-4">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">用户名 <span class="text-red-400">*</span></label>
+                            <input type="text" id="username" required class="input-field w-full px-4 py-3 rounded-lg" placeholder="请输入用户名">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">手机号 <span class="text-red-400">*</span></label>
+                            <input type="tel" id="phone" required pattern="1[3-9]\d{9}" class="input-field w-full px-4 py-3 rounded-lg" placeholder="请输入手机号">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">邮箱</label>
+                        <input type="email" id="email" class="input-field w-full px-4 py-3 rounded-lg" placeholder="请输入邮箱（选填）">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">密码 <span class="text-red-400">*</span></label>
+                        <input type="password" id="password" required minlength="6" class="input-field w-full px-4 py-3 rounded-lg" placeholder="请设置密码（至少6位）">
+                        <div class="mt-2">
+                            <div class="flex space-x-1">
+                                <div class="password-strength flex-1 bg-gray-700" id="strength1"></div>
+                                <div class="password-strength flex-1 bg-gray-700" id="strength2"></div>
+                                <div class="password-strength flex-1 bg-gray-700" id="strength3"></div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1" id="strengthText">密码强度：未输入</p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">确认密码 <span class="text-red-400">*</span></label>
+                        <input type="password" id="confirmPassword" required class="input-field w-full px-4 py-3 rounded-lg" placeholder="请再次输入密码">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">真实姓名</label>
+                        <input type="text" id="realName" class="input-field w-full px-4 py-3 rounded-lg" placeholder="请输入真实姓名（选填）">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">所属机构/单位 <span class="text-red-500">*</span></label>
+                        <input type="text" id="organization" required class="input-field w-full px-4 py-3 rounded-lg" placeholder="请输入所属机构或单位名称">
+                    </div>
+                    <div class="flex items-start mt-4">
+                        <input type="checkbox" id="agreement" required class="mt-1 mr-2 w-4 h-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500">
+                        <label class="text-sm text-gray-300">
+                            我已阅读并同意<a href="#" class="text-blue-400 hover:text-blue-300 underline">用户协议</a>和<a href="#" class="text-blue-400 hover:text-blue-300 underline">隐私政策</a>
+                        </label>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="button" onclick="prevStep()" class="flex-1 py-3 rounded-lg border border-gray-600 hover:bg-white hover:bg-opacity-10 transition-colors">
+                            上一步
+                        </button>
+                        <button type="submit" id="registerBtn" class="btn-primary flex-1 py-3 rounded-lg font-medium flex items-center justify-center">
+                            <span id="btnText">注册</span>
+                            <svg id="btnSpinner" class="loading-spinner hidden w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 步骤3: 注册成功 -->
+            <div id="step3" class="glass-card p-8 rounded-2xl hidden text-center">
+                <div class="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold mb-4">注册成功！</h2>
+                <p class="text-gray-300 mb-6">您的账号已创建成功，现在可以登录使用平台服务</p>
+                <a href="login.html" class="btn-primary inline-block px-8 py-3 rounded-lg font-medium">
+                    立即登录
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div id="toast" class="fixed top-4 right-4 hidden z-50">
+        <div class="glass-card px-6 py-3 rounded-lg flex items-center space-x-2 toast">
+            <span id="toastIcon"></span>
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedRole = '';
+
+        // 选择角色
+        function selectRole(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-role="${role}"]`).classList.add('selected');
+            
+            // 延迟进入下一步
+            setTimeout(() => {
+                nextStep();
+            }, 300);
+        }
+
+        // 下一步
+        function nextStep() {
+            if (currentStep === 1 && !selectedRole) {
+                showToast('error', '请先选择角色');
+                return;
+            }
+
+            document.getElementById(`step${currentStep}`).classList.add('hidden');
+            currentStep++;
+            document.getElementById(`step${currentStep}`).classList.remove('hidden');
+            document.getElementById(`step${currentStep}`).classList.add('fade-in');
+
+            updateStepIndicator();
+        }
+
+        // 上一步
+        function prevStep() {
+            document.getElementById(`step${currentStep}`).classList.add('hidden');
+            currentStep--;
+            document.getElementById(`step${currentStep}`).classList.remove('hidden');
+            document.getElementById(`step${currentStep}`).classList.add('fade-in');
+
+            updateStepIndicator();
+        }
+
+        // 更新步骤指示器
+        function updateStepIndicator() {
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById(`step${i}Dot`);
+                const line = document.getElementById(`line${i}`);
+
+                if (i < currentStep) {
+                    dot.className = 'step-dot completed';
+                    dot.innerHTML = '✓';
+                    if (line) line.classList.add('completed');
+                } else if (i === currentStep) {
+                    dot.className = 'step-dot active';
+                    dot.innerHTML = i;
+                } else {
+                    dot.className = 'step-dot pending';
+                    dot.innerHTML = i;
+                    if (line) line.classList.remove('completed');
+                }
+            }
+        }
+
+        // 检查密码强度
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strength1 = document.getElementById('strength1');
+            const strength2 = document.getElementById('strength2');
+            const strength3 = document.getElementById('strength3');
+            const strengthText = document.getElementById('strengthText');
+
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (password.length >= 8 && /[a-zA-Z]/.test(password) && /\d/.test(password)) strength++;
+            if (password.length >= 10 && /[!@#$%^&*]/.test(password)) strength++;
+
+            strength1.className = 'password-strength flex-1 ' + (strength >= 1 ? 'bg-red-500' : 'bg-gray-700');
+            strength2.className = 'password-strength flex-1 ' + (strength >= 2 ? 'bg-yellow-500' : 'bg-gray-700');
+            strength3.className = 'password-strength flex-1 ' + (strength >= 3 ? 'bg-green-500' : 'bg-gray-700');
+
+            const strengthLabels = ['未输入', '弱', '中', '强'];
+            strengthText.textContent = '密码强度：' + strengthLabels[strength];
+        });
+
+        // 显示Toast提示
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+
+            if (type === 'success') {
+                toastIcon.innerHTML = '<svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+            } else if (type === 'error') {
+                toastIcon.innerHTML = '<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            } else {
+                toastIcon.innerHTML = '<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+            }
+
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // 注册表单提交
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                showToast('error', '两次输入的密码不一致');
+                document.getElementById('confirmPassword').classList.add('error');
+                return;
+            }
+
+            const userData = {
+                username: document.getElementById('username').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value || undefined,
+                password: password,
+                role: selectedRole,
+                realName: document.getElementById('realName').value || undefined,
+                organization: document.getElementById('organization').value || undefined
+            };
+
+            const registerBtn = document.getElementById('registerBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+
+            registerBtn.disabled = true;
+            btnText.textContent = '注册中...';
+            btnSpinner.classList.remove('hidden');
+
+            try {
+                console.log('注册数据:', userData);
+                const result = await AuthAPI.register(userData);
+                console.log('注册结果:', result);
+
+                if (result.success) {
+                    showToast('success', '注册成功！');
+                    setTimeout(() => {
+                        nextStep();
+                    }, 1000);
+                } else {
+                    showToast('error', result.message || '注册失败');
+                    registerBtn.disabled = false;
+                    btnText.textContent = '注册';
+                    btnSpinner.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('注册错误:', error);
+                showToast('error', '网络错误，请稍后重试');
+                registerBtn.disabled = false;
+                btnText.textContent = '注册';
+                btnSpinner.classList.add('hidden');
+            }
+        });
+
+        // 清除错误样式
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            this.classList.remove('error');
+        });
+
+        // 页面加载时检查是否已登录
+        document.addEventListener('DOMContentLoaded', () => {
+            if (ApiService.isLoggedIn()) {
+                const user = ApiService.getCurrentUser();
+                if (user) {
+                    if (user.role === 'admin') {
+                        window.location.href = 'http://localhost:3002/admin/';
+                    } else {
+                        window.location.href = 'user.html';
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

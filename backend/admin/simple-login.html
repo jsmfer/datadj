@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>简单登录</title>
+    <style>
+        body { font-family: sans-serif; padding: 50px; text-align: center; }
+        input { padding: 10px; margin: 5px; width: 200px; }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+        #msg { margin-top: 20px; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>管理员登录 (简化版)</h1>
+    <div>
+        <input type="text" id="phone" value="admin" placeholder="账号"><br>
+        <input type="password" id="password" value="admin123" placeholder="密码"><br>
+        <button onclick="login()">登录</button>
+        <button onclick="goToAdmin()">进入后台(需先登录)</button>
+    </div>
+    <div id="msg"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:3002/api';
+        const msgEl = document.getElementById('msg');
+        
+        function msg(text) {
+            msgEl.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + text + '</div>';
+        }
+        
+        async function login() {
+            msg('开始登录...');
+            try {
+                const res = await fetch(API_BASE + '/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        phone: document.getElementById('phone').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    msg('✅ 登录成功');
+                    msg('角色: ' + data.data.user.role);
+                    localStorage.setItem('adminToken', data.data.token);
+                    msg('✅ Token已保存');
+                } else {
+                    msg('❌ 失败: ' + data.message);
+                }
+            } catch(e) {
+                msg('❌ 错误: ' + e.message);
+            }
+        }
+        
+        function goToAdmin() {
+            if (!localStorage.getItem('adminToken')) {
+                msg('❌ 请先登录');
+                return;
+            }
+            msg('正在跳转...');
+            window.location.href = 'index.html';
+        }
+        
+        // 页面加载时检查
+        const token = localStorage.getItem('adminToken');
+        if (token) {
+            msg('页面加载: 发现token');
+        } else {
+            msg('页面加载: 无token');
+        }
+    </script>
+</body>
+</html>

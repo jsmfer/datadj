@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>维权服务 - 天津数据产权登记服务平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="js/components/simple-layout.js"></script>
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #3b82f6;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --error-red: #ef4444;
+            --neutral-gray: #6b7280;
+            --light-gray: #f3f4f6;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-2px);
+            color: #3b82f6;
+        }
+        
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .service-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .case-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .case-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-processing {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .status-resolved {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .status-closed {
+            background: rgba(107, 114, 128, 0.2);
+            color: #6b7280;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+        
+        .monitoring-alert {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+        }
+        
+        .legal-consultation {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        .evidence-upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .evidence-upload-area:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .evidence-upload-area.dragover {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0.5rem;
+            width: 0.5rem;
+            height: 0.5rem;
+            background: #3b82f6;
+            border-radius: 50%;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 0.75rem;
+            top: 1rem;
+            width: 1px;
+            height: calc(100% - 1rem);
+            background: rgba(59, 130, 246, 0.3);
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+    </style>
+</head>
+<body class="text-white" data-layout-init data-current-page="protect">
+    <!-- Header Container -->
+    <div id="header-container"></div>
+
+    <main class="page-content">
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4">数据维权服务中心</h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    专业的数据产权保护服务，实时监测侵权行为，提供全方位的维权支持和法律援助
+                </p>
+            </div>
+
+            <!-- Service Overview -->
+            <div class="grid md:grid-cols-3 gap-8 mb-12">
+                <div class="service-card glass-card p-8 rounded-2xl text-center">
+                    <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">侵权监测</h3>
+                    <p class="text-gray-300 mb-6">7×24小时实时监控数据使用情况，自动识别异常访问和潜在侵权行为</p>
+                    <button onclick="showMonitoringDashboard()" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg transition-colors">
+                        查看监测
+                    </button>
+                </div>
+
+                <div class="service-card glass-card p-8 rounded-2xl text-center">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">维权申请</h3>
+                    <p class="text-gray-300 mb-6">在线提交维权申请，专业团队快速响应，全程跟踪处理进度</p>
+                    <button onclick="showProtectionForm()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg transition-colors">
+                        申请维权
+                    </button>
+                </div>
+
+                <div class="service-card glass-card p-8 rounded-2xl text-center">
+                    <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">法律咨询</h3>
+                    <p class="text-gray-300 mb-6">专业律师团队提供法律咨询服务，制定最优维权策略</p>
+                    <button onclick="showLegalConsultation()" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg transition-colors">
+                        咨询专家
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Monitoring Dashboard -->
+                    <div class="glass-card p-6 rounded-2xl" id="monitoringSection">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold">侵权监测仪表板</h2>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-sm text-gray-300">监测状态：</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-3 h-3 bg-green-400 rounded-full monitoring-alert"></div>
+                                    <span class="text-green-400 text-sm">正常运行</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-4 gap-6 mb-8">
+                            <div class="text-center">
+                                <div class="relative w-20 h-20 mx-auto mb-3">
+                                    <svg class="progress-ring w-20 h-20">
+                                        <circle class="progress-ring-circle" stroke="#374151" stroke-width="4" fill="transparent" r="36" cx="40" cy="40"/>
+                                        <circle class="progress-ring-circle" stroke="#10b981" stroke-width="4" fill="transparent" r="36" cx="40" cy="40" stroke-dasharray="226" stroke-dashoffset="45"/>
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <span class="text-lg font-bold text-green-400">80%</span>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-300">安全指数</div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-blue-400 mb-2">1,247</div>
+                                <div class="text-sm text-gray-300">监测数据项</div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-yellow-400 mb-2">3</div>
+                                <div class="text-sm text-gray-300">可疑行为</div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-red-400 mb-2">1</div>
+                                <div class="text-sm text-gray-300">确认侵权</div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Alerts -->
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">最近警报</h3>
+                            <div class="space-y-3" id="recentAlerts">
+                                <!-- Alerts will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Protection Cases -->
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold">我的维权案件</h2>
+                            <button onclick="showProtectionForm()" class="btn-primary px-4 py-2 rounded-lg text-sm">
+                                新建案件
+                            </button>
+                        </div>
+
+                        <div class="space-y-4" id="protectionCases">
+                            <!-- Cases will be populated here -->
+                        </div>
+                        <div class="mt-4 text-center">
+                            <button onclick="loadProtectionCases()" class="text-blue-400 hover:text-blue-300 text-sm">
+                                <i class="fas fa-sync-alt mr-1"></i>刷新列表
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Legal Consultation -->
+                    <div class="legal-consultation p-6 rounded-2xl">
+                        <h2 class="text-2xl font-bold mb-6">法律咨询服务</h2>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold mb-4">专业律师团队</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center space-x-3 p-3 bg-white bg-opacity-5 rounded-lg">
+                                        <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
+                                            <span class="text-white font-bold">李</span>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium">李律师</div>
+                                            <div class="text-sm text-gray-300">数据法务专家，10年经验</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-3 p-3 bg-white bg-opacity-5 rounded-lg">
+                                        <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
+                                            <span class="text-white font-bold">王</span>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium">王律师</div>
+                                            <div class="text-sm text-gray-300">知识产权专家，8年经验</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-lg font-bold mb-4">服务统计</h3>
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-300">咨询总数</span>
+                                        <span class="text-2xl font-bold text-purple-400">256</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-300">解决率</span>
+                                        <span class="text-2xl font-bold text-green-400">94%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-300">平均响应时间</span>
+                                        <span class="text-2xl font-bold text-blue-400">2小时</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-center">
+                            <button onclick="startConsultation()" class="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-lg font-medium transition-colors">
+                                开始咨询
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Quick Actions -->
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-lg font-bold mb-4">快速操作</h3>
+                        <div class="space-y-3">
+                            <button onclick="showProtectionForm()" class="w-full bg-red-600 hover:bg-red-700 py-3 rounded-lg text-sm transition-colors">
+                                紧急维权申请
+                            </button>
+                            <button onclick="showMonitoringDashboard()" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg text-sm transition-colors">
+                                查看监测报告
+                            </button>
+                            <button onclick="downloadGuidelines()" class="w-full bg-green-600 hover:bg-green-700 py-3 rounded-lg text-sm transition-colors">
+                                下载维权指南
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Case Statistics -->
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-lg font-bold mb-4">案件统计</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">总案件数</span>
+                                <span class="text-xl font-bold">18</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">处理中</span>
+                                <span class="text-xl font-bold text-yellow-400">3</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">已解决</span>
+                                <span class="text-xl font-bold text-green-400">14</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-300">成功率</span>
+                                <span class="text-xl font-bold text-blue-400">78%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Success Cases -->
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-lg font-bold mb-4">成功案例</h3>
+                        <div class="space-y-3" id="successCases">
+                            <!-- Success cases will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-lg font-bold mb-4">联系方式</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                </svg>
+                                <span>维权热线：400-123-4567</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                <span>邮箱：protection@tjdata.gov.cn</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span>工作时间：9:00-18:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </main>
+
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
+
+    <!-- Protection Form Modal -->
+    <div id="protectionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-card p-8 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">维权申请</h3>
+                <button onclick="closeProtectionModal()" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="protectionForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">案件标题 *</label>
+                    <input type="text" id="caseTitle" class="form-input w-full px-4 py-3 rounded-lg" placeholder="请简洁描述案件核心内容" required>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">申请人姓名 *</label>
+                        <input type="text" id="applicantName" class="form-input w-full px-4 py-3 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">联系电话 *</label>
+                        <input type="tel" id="applicantPhone" class="form-input w-full px-4 py-3 rounded-lg" required>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">数据产权信息 *</label>
+                    <select id="dataProperty" class="form-input w-full px-4 py-3 rounded-lg" required>
+                        <option value="">加载中...</option>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-1" id="dataPropertyHint">正在加载您的数据产权列表...</p>
+                </div>
+                
+                <div id="otherPropertyInfo" class="hidden">
+                    <label class="block text-sm font-medium mb-2">其他数据产权信息</label>
+                    <input type="text" id="otherProperty" class="form-input w-full px-4 py-3 rounded-lg" placeholder="请输入数据产权名称和登记编号">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">侵权类型 *</label>
+                    <select id="infringementType" class="form-input w-full px-4 py-3 rounded-lg" required>
+                        <option value="">请选择侵权类型</option>
+                        <option value="copyright">著作权侵权</option>
+                        <option value="trademark">商标侵权</option>
+                        <option value="trade_secret">商业秘密侵权</option>
+                        <option value="data_breach">数据泄露</option>
+                        <option value="unauthorized_use">未经授权使用</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">侵权描述 *</label>
+                    <textarea id="infringementDescription" class="form-input w-full px-4 py-3 rounded-lg h-32" placeholder="请详细描述侵权行为和具体情况..." required></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">侵权方信息</label>
+                    <input type="text" id="infringerInfo" class="form-input w-full px-4 py-3 rounded-lg" placeholder="如知道侵权方信息，请填写名称、联系方式等">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">证据材料 *</label>
+                    <div class="evidence-upload-area p-6 rounded-lg text-center" id="evidenceUploadArea">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="text-lg font-medium mb-2">点击上传或拖拽文件到此处</p>
+                        <p class="text-sm text-gray-300 mb-4">支持格式：PDF, DOC, DOCX, JPG, PNG, MP4 (每个文件最大10MB)</p>
+                        <input type="file" id="evidenceFiles" class="hidden" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.mp4">
+                        <button type="button" onclick="document.getElementById('evidenceFiles').click()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg transition-colors">
+                            选择文件
+                        </button>
+                    </div>
+                    <div id="evidenceFilesList" class="mt-4 space-y-2 hidden">
+                        <!-- Evidence files will be listed here -->
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">期望解决方式</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" value="stop-infringement" class="mr-2">
+                            <span>要求停止侵权行为</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" value="compensation" class="mr-2">
+                            <span>要求经济赔偿</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" value="public-apology" class="mr-2">
+                            <span>要求公开道歉</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" value="legal-action" class="mr-2">
+                            <span>提起法律诉讼</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="closeProtectionModal()" class="bg-gray-600 hover:bg-gray-700 px-8 py-3 rounded-lg transition-colors">
+                        取消
+                    </button>
+                    <button type="submit" class="btn-primary px-8 py-3 rounded-lg">
+                        保存案件
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Case Detail Modal -->
+    <div id="caseDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-card p-8 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">案件详情</h3>
+                <button onclick="closeCaseDetailModal()" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="caseDetailContent" class="space-y-4">
+                <!-- 详情内容将在这里动态填充 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Consultation Modal -->
+    <div id="consultationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-card p-8 rounded-2xl max-w-2xl w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">法律咨询</h3>
+                <button onclick="closeConsultationModal()" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">咨询类型</label>
+                    <select id="consultationType" class="form-input w-full px-4 py-3 rounded-lg">
+                        <option value="infringement">侵权咨询</option>
+                        <option value="contract">合同咨询</option>
+                        <option value="registration">登记咨询</option>
+                        <option value="other">其他咨询</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">咨询问题</label>
+                    <textarea id="consultationQuestion" class="form-input w-full px-4 py-3 rounded-lg h-32" placeholder="请详细描述您的法律问题..."></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">联系方式</label>
+                    <input type="text" id="consultationContact" class="form-input w-full px-4 py-3 rounded-lg" placeholder="请输入您的联系方式">
+                </div>
+                
+                <div class="flex justify-end space-x-4">
+                    <button onclick="closeConsultationModal()" class="bg-gray-600 hover:bg-gray-700 px-6 py-2 rounded-lg transition-colors">
+                        取消
+                    </button>
+                    <button onclick="submitConsultation()" class="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg transition-colors">
+                        提交咨询
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth-check.js"></script>
+    <script src="main.js"></script>
+    <script>
+        // Protection page specific functionality
+        let uploadedEvidence = [];
+
+        // Initialize protection page
+        let pageInitialized = false;
+        async function initializePage() {
+            if (pageInitialized) {
+                console.log('[Protect] 页面已初始化，跳过');
+                return;
+            }
+            pageInitialized = true;
+            
+            console.log('[Protect] 开始初始化页面...');
+            
+            // 布局已由 simple-layout.js 自动初始化（通过 data-layout-init 属性）
+            // 这里只需初始化页面特定功能
+            loadMonitoringAlerts();
+            loadProtectionCases();
+            loadSuccessCases();
+            loadConsultationStats(); // 加载咨询统计（真实数据）
+            loadDataProperties(); // 加载用户的数据产权列表
+            initializeEventListeners();
+            
+            console.log('[Protect] 页面初始化完成');
+        }
+
+        // 监听布局组件加载完成事件
+        window.addEventListener('layoutComponentsLoaded', initializePage);
+        
+        // 如果布局已经加载完成（事件已触发），立即初始化
+        if (window.layoutComponentsLoaded) {
+            initializePage();
+        }
+
+        // Load monitoring alerts
+        function loadMonitoringAlerts() {
+            const alerts = [
+                {
+                    time: '2024-11-20 14:30',
+                    type: 'warning',
+                    title: '异常访问检测',
+                    description: '检测到对您的数据资产的异常访问行为',
+                    severity: 'medium'
+                },
+                {
+                    time: '2024-11-19 09:15',
+                    type: 'danger',
+                    title: '疑似侵权发现',
+                    description: '发现疑似未经授权的数据使用情况',
+                    severity: 'high'
+                },
+                {
+                    time: '2024-11-18 16:45',
+                    type: 'info',
+                    title: '定期安全检查',
+                    description: '完成定期的数据安全检查，未发现异常',
+                    severity: 'low'
+                }
+            ];
+
+            const container = document.getElementById('recentAlerts');
+            container.innerHTML = alerts.map(alert => `
+                <div class="flex items-start space-x-4 p-4 bg-white bg-opacity-5 rounded-lg">
+                    <div class="w-2 h-2 rounded-full mt-2 ${getAlertColor(alert.severity)}"></div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-medium">${alert.title}</h4>
+                            <span class="text-xs text-gray-400">${alert.time}</span>
+                        </div>
+                        <p class="text-sm text-gray-300">${alert.description}</p>
+                        <div class="mt-2">
+                            <button onclick="handleAlert('${alert.type}')" class="text-blue-400 hover:text-blue-300 text-sm">
+                                查看详情 →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get alert color by severity
+        function getAlertColor(severity) {
+            const colorMap = {
+                'low': 'bg-blue-400',
+                'medium': 'bg-yellow-400',
+                'high': 'bg-red-400'
+            };
+            return colorMap[severity] || 'bg-gray-400';
+        }
+
+        // Load protection cases
+        async function loadProtectionCases() {
+            console.log('[Protect] 开始加载维权案件...');
+            
+            const container = document.getElementById('protectionCases');
+            if (!container) {
+                console.error('[Protect] 找不到protectionCases容器');
+                return;
+            }
+            
+            // 显示加载中
+            container.innerHTML = '<div class="text-center py-8 text-gray-400">加载中...</div>';
+            
+            let cases = [];
+            let errorMsg = '';
+            let debugInfo = [];
+            
+            try {
+                // 检查登录状态
+                const isLoggedIn = ApiService.isLoggedIn();
+                const token = ApiService.getToken();
+                debugInfo.push(`登录状态: ${isLoggedIn}`);
+                debugInfo.push(`Token: ${token ? token.substring(0, 20) + '...' : '无'}`);
+                console.log('[Protect] 登录状态:', isLoggedIn, 'Token:', token ? '存在' : '不存在');
+                
+                if (isLoggedIn) {
+                    console.log('[Protect] 从API获取维权案件...');
+                    const result = await ProtectionAPI.getList();
+                    console.log('[Protect] API返回:', result);
+                    debugInfo.push(`API返回: ${JSON.stringify(result).substring(0, 200)}...`);
+                    
+                    if (result.success && result.data && result.data.list) {
+                        cases = result.data.list;
+                        console.log(`[Protect] 成功获取 ${cases.length} 个案件`);
+                        debugInfo.push(`获取到 ${cases.length} 个案件`);
+                    } else {
+                        errorMsg = result.message || 'API返回数据异常';
+                        debugInfo.push(`错误: ${errorMsg}`);
+                        console.warn('[Protect] API返回异常:', result);
+                    }
+                } else {
+                    errorMsg = '请先登录后查看您的维权案件';
+                    debugInfo.push('未登录');
+                    console.log('[Protect] 用户未登录');
+                }
+            } catch (error) {
+                errorMsg = '加载失败: ' + (error.message || '未知错误');
+                debugInfo.push(`异常: ${error.message}`);
+                console.error('[Protect] 加载维权案件失败:', error);
+            }
+            
+            // 如果没有数据，显示提示信息
+            if (cases.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-gray-400 mb-4">暂无维权案件</div>
+                        ${errorMsg ? `<div class="text-sm text-yellow-400 mb-4">${errorMsg}</div>` : ''}
+                        <button onclick="showProtectionForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                            提交维权申请
+                        </button>
+                        <div class="mt-4 p-3 bg-gray-800 rounded text-left text-xs text-gray-500">
+                            <div class="font-bold mb-1">调试信息:</div>
+                            ${debugInfo.map(d => `<div>${d}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 渲染案件列表
+            container.innerHTML = cases.map(caseItem => `
+                <div class="case-card glass-card p-6 rounded-xl border border-gray-600 hover:border-gray-500 transition-all">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-bold text-white">${caseItem.title || caseItem.registration_title || '未命名案件'}</h3>
+                        <span class="status-badge status-${caseItem.status}">${getStatusText(caseItem.status)}</span>
+                    </div>
+                    
+                    <p class="text-gray-300 mb-4 text-sm">${caseItem.description || '暂无描述'}</p>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-400">处理进度</span>
+                            <span class="text-blue-400">${caseItem.progress || 0}%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: ${caseItem.progress || 0}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center text-sm text-gray-400 mb-3">
+                        <span>案号：${caseItem.case_no || '-'}</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center text-xs text-gray-500">
+                        <span>创建：${caseItem.created_at ? new Date(caseItem.created_at).toLocaleDateString('zh-CN') : '-'}</span>
+                        <span>更新：${caseItem.updated_at ? new Date(caseItem.updated_at).toLocaleDateString('zh-CN') : '-'}</span>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 mt-4 pt-4 border-t border-gray-700">
+                        <button onclick="viewCaseDetail('${caseItem.id}')" class="text-blue-400 hover:text-blue-300 text-sm">
+                            查看详情
+                        </button>
+                        ${caseItem.status === 'processing' ? `
+                            <button onclick="trackCase('${caseItem.id}')" class="text-green-400 hover:text-green-300 text-sm">
+                                跟踪进度
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log(`[Protect] 渲染了 ${cases.length} 个维权案件`);
+        }
+
+        // Load user's data properties for dropdown
+        async function loadDataProperties() {
+            console.log('[Protect] 开始加载数据产权列表...');
+            
+            const select = document.getElementById('dataProperty');
+            const hint = document.getElementById('dataPropertyHint');
+            
+            if (!select) {
+                console.error('[Protect] 找不到数据产权下拉框');
+                return;
+            }
+            
+            try {
+                // 检查登录状态
+                if (!ApiService.isLoggedIn()) {
+                    select.innerHTML = '<option value="">请先登录</option>';
+                    if (hint) hint.textContent = '登录后可选择您的数据产权';
+                    return;
+                }
+                
+                // 从API获取用户的登记列表
+                const result = await RegistrationAPI.getList({ pageSize: 100 });
+                console.log('[Protect] 数据产权API返回:', result);
+                
+                if (result.success && result.data && result.data.list) {
+                    const registrations = result.data.list;
+                    console.log(`[Protect] 获取到 ${registrations.length} 个登记`);
+                    
+                    // 清空并重新填充下拉框
+                    select.innerHTML = '<option value="">请选择相关数据产权</option>';
+                    
+                    if (registrations.length === 0) {
+                        // 没有登记数据
+                        select.innerHTML += '<option value="" disabled>暂无已登记数据产权</option>';
+                        if (hint) hint.textContent = '您还没有登记的数据产权，可以选择"其他数据产权"';
+                    } else {
+                        // 添加用户的登记数据
+                        registrations.forEach(reg => {
+                            const option = document.createElement('option');
+                            option.value = reg.id;
+                            option.textContent = reg.title || '未命名登记';
+                            option.dataset.regNo = reg.registration_no;
+                            select.appendChild(option);
+                        });
+                        if (hint) hint.textContent = `已加载 ${registrations.length} 个数据产权`;
+                    }
+                    
+                    // 添加"其他选项"
+                    const otherOption = document.createElement('option');
+                    otherOption.value = 'other';
+                    otherOption.textContent = '其他数据产权';
+                    select.appendChild(otherOption);
+                    
+                } else {
+                    console.warn('[Protect] 获取数据产权列表失败:', result.message);
+                    select.innerHTML = '<option value="">加载失败</option><option value="other">其他数据产权</option>';
+                    if (hint) hint.textContent = '加载失败，请刷新页面重试';
+                }
+            } catch (error) {
+                console.error('[Protect] 加载数据产权列表失败:', error);
+                select.innerHTML = '<option value="">加载失败</option><option value="other">其他数据产权</option>';
+                if (hint) hint.textContent = '网络错误，请检查网络连接';
+            }
+        }
+
+        // Load success cases
+        // 加载成功案例（真实数据）
+        async function loadSuccessCases() {
+            try {
+                const container = document.getElementById('successCases');
+                container.innerHTML = '<div class="text-center text-gray-400 py-2">加载中...</div>';
+                
+                const result = await ConsultationAPI.getCases(5);
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    container.innerHTML = result.data.map(caseItem => `
+                        <div class="p-3 bg-green-600 bg-opacity-20 rounded-lg">
+                            <div class="font-medium text-sm mb-1">${caseItem.title}</div>
+                            <div class="text-xs text-gray-300 mb-1">${caseItem.result || '维权成功'}</div>
+                            <div class="text-xs text-gray-400">${new Date(caseItem.created_at).toLocaleDateString('zh-CN')}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    // 如果没有数据，显示默认信息
+                    container.innerHTML = `
+                        <div class="p-3 bg-gray-600 bg-opacity-20 rounded-lg text-center">
+                            <div class="text-sm text-gray-300">暂无成功案例</div>
+                            <div class="text-xs text-gray-400 mt-1">期待您的第一个成功案例</div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('加载成功案例失败:', error);
+                document.getElementById('successCases').innerHTML = `
+                    <div class="p-3 bg-gray-600 bg-opacity-20 rounded-lg text-center">
+                        <div class="text-sm text-gray-300">加载失败</div>
+                    </div>
+                `;
+            }
+        }
+
+        // 加载法律咨询统计数据（真实数据）
+        async function loadConsultationStats() {
+            try {
+                const result = await ConsultationAPI.getStats();
+                
+                if (result.success) {
+                    const data = result.data;
+                    // 更新服务统计
+                    updateServiceStats(data);
+                }
+            } catch (error) {
+                console.error('加载咨询统计失败:', error);
+            }
+            
+            // 同时加载案件统计
+            loadCaseStats();
+        }
+
+        // 更新服务统计数据
+        function updateServiceStats(data) {
+            // 咨询总数 - 在服务统计区域
+            const statsContainer = document.querySelector('.space-y-4');
+            if (statsContainer) {
+                const statItems = statsContainer.querySelectorAll('.flex.justify-between');
+                if (statItems.length >= 3) {
+                    // 咨询总数
+                    const totalEl = statItems[0].querySelector('.text-2xl');
+                    if (totalEl) totalEl.textContent = data.total || 0;
+                    
+                    // 解决率
+                    const rateEl = statItems[1].querySelector('.text-2xl');
+                    if (rateEl) rateEl.textContent = (data.resolutionRate || 0) + '%';
+                }
+            }
+        }
+
+        // 加载案件统计数据（真实数据）
+        async function loadCaseStats() {
+            try {
+                const result = await ConsultationAPI.getCaseStats();
+                
+                if (result.success) {
+                    const data = result.data;
+                    
+                    // 查找案件统计容器
+                    const caseStatsContainers = document.querySelectorAll('.glass-card');
+                    caseStatsContainers.forEach(card => {
+                        const title = card.querySelector('h3');
+                        if (title && title.textContent.includes('案件统计')) {
+                            const statItems = card.querySelectorAll('.flex.justify-between');
+                            if (statItems.length >= 4) {
+                                // 总案件数
+                                const totalEl = statItems[0].querySelector('.text-xl');
+                                if (totalEl) totalEl.textContent = data.total || 0;
+                                
+                                // 处理中
+                                const processingEl = statItems[1].querySelector('.text-xl');
+                                if (processingEl) processingEl.textContent = data.processing || 0;
+                                
+                                // 已解决
+                                const resolvedEl = statItems[2].querySelector('.text-xl');
+                                if (resolvedEl) resolvedEl.textContent = (data.resolved || 0) + (data.closed || 0);
+                                
+                                // 成功率
+                                const successEl = statItems[3].querySelector('.text-xl');
+                                if (successEl) successEl.textContent = (data.successRate || 0) + '%';
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('加载案件统计失败:', error);
+            }
+        }
+
+        // Get status display text
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '待处理',
+                'processing': '处理中',
+                'investigating': '调查中',
+                'resolved': '已解决',
+                'closed': '已关闭',
+                'rejected': '已驳回'
+            };
+            return statusMap[status] || status || '未知状态';
+        }
+
+        // Initialize event listeners
+        function initializeEventListeners() {
+            // Data property selection
+            document.getElementById('dataProperty').addEventListener('change', function() {
+                const otherInfo = document.getElementById('otherPropertyInfo');
+                if (this.value === 'other') {
+                    otherInfo.classList.remove('hidden');
+                } else {
+                    otherInfo.classList.add('hidden');
+                }
+            });
+
+            // Evidence file upload
+            document.getElementById('evidenceFiles').addEventListener('change', function(e) {
+                handleEvidenceUpload(e.target.files);
+            });
+
+            // Form submission
+            document.getElementById('protectionForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitProtectionApplication();
+            });
+
+            // Setup drag and drop for evidence upload
+            setupDragAndDrop();
+        }
+
+        // Setup drag and drop
+        function setupDragAndDrop() {
+            const area = document.getElementById('evidenceUploadArea');
+            
+            area.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                area.classList.add('dragover');
+            });
+            
+            area.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                area.classList.remove('dragover');
+            });
+            
+            area.addEventListener('drop', function(e) {
+                e.preventDefault();
+                area.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleEvidenceUpload(files);
+                }
+            });
+        }
+
+        // Handle evidence upload
+        function handleEvidenceUpload(files) {
+            if (!files || files.length === 0) return;
+            
+            const filesList = document.getElementById('evidenceFilesList');
+            filesList.classList.remove('hidden');
+            
+            Array.from(files).forEach((file, index) => {
+                uploadedEvidence.push(file);
+                
+                const fileItem = document.createElement('div');
+                fileItem.className = 'flex items-center justify-between p-3 bg-green-600 bg-opacity-20 rounded-lg';
+                fileItem.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <div class="font-medium">${file.name}</div>
+                            <div class="text-sm text-gray-300">${formatFileSize(file.size)}</div>
+                        </div>
+                    </div>
+                    <button onclick="removeEvidenceFile(${uploadedEvidence.length - 1})" class="text-red-400 hover:text-red-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                `;
+                filesList.appendChild(fileItem);
+            });
+        }
+
+        // Remove evidence file
+        function removeEvidenceFile(index) {
+            uploadedEvidence.splice(index, 1);
+            
+            if (uploadedEvidence.length === 0) {
+                document.getElementById('evidenceFilesList').classList.add('hidden');
+            } else {
+                // Re-render the list
+                const files = uploadedEvidence;
+                uploadedEvidence = [];
+                document.getElementById('evidenceFilesList').innerHTML = '';
+                handleEvidenceUpload(files);
+            }
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Show monitoring dashboard
+        function showMonitoringDashboard() {
+            document.getElementById('monitoringSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Show protection form
+        function showProtectionForm() {
+            document.getElementById('protectionModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close protection modal
+        function closeProtectionModal() {
+            document.getElementById('protectionModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            document.getElementById('protectionForm').reset();
+            uploadedEvidence = [];
+            document.getElementById('evidenceFilesList').classList.add('hidden');
+        }
+
+        // Submit protection application
+        async function submitProtectionApplication() {
+            console.log('[Protect] 开始提交维权申请...');
+            
+            // Validate required fields
+            const requiredFields = [
+                { id: 'caseTitle', name: '案件标题' },
+                { id: 'applicantName', name: '申请人姓名' },
+                { id: 'applicantPhone', name: '联系电话' },
+                { id: 'dataProperty', name: '数据产权信息', isSelect: true },
+                { id: 'infringementType', name: '侵权类型', isSelect: true },
+                { id: 'infringementDescription', name: '侵权描述' }
+            ];
+            
+            for (let field of requiredFields) {
+                const element = document.getElementById(field.id);
+                if (!element) {
+                    console.error(`[Protect] 找不到字段: ${field.id}`);
+                    alert(`系统错误：找不到${field.name}字段`);
+                    return;
+                }
+                
+                const value = element.value.trim();
+                console.log(`[Protect] 验证字段 ${field.id}: "${value}"`);
+                
+                // 特殊处理下拉框
+                if (field.isSelect) {
+                    if (!value) {
+                        alert(`请选择${field.name}`);
+                        element.focus();
+                        return;
+                    }
+                    // 如果选择了"其他数据产权"，检查是否填写了其他信息
+                    if (value === 'other' && field.id === 'dataProperty') {
+                        const otherInfo = document.getElementById('otherProperty');
+                        if (!otherInfo || !otherInfo.value.trim()) {
+                            alert('请填写其他数据产权信息');
+                            otherInfo.focus();
+                            return;
+                        }
+                    }
+                    continue;
+                }
+                
+                if (!value) {
+                    alert(`请填写${field.name}`);
+                    element.focus();
+                    return;
+                }
+            }
+            
+            console.log('[Protect] 所有必填字段验证通过');
+            
+            try {
+                // 检查登录状态
+                if (!ApiService.isLoggedIn()) {
+                    alert('请先登录');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                console.log('[Protect] 用户已登录');
+                
+                // Gather form data
+                const dataProperty = document.getElementById('dataProperty');
+                const selectedOption = dataProperty.options[dataProperty.selectedIndex];
+                
+                // 处理数据产权标题
+                let registrationTitle = '其他数据产权';
+                if (dataProperty.value && dataProperty.value !== 'other') {
+                    registrationTitle = selectedOption ? selectedOption.text : '未知数据';
+                } else if (dataProperty.value === 'other') {
+                    const otherInput = document.getElementById('otherProperty');
+                    if (otherInput && otherInput.value.trim()) {
+                        registrationTitle = otherInput.value.trim();
+                    }
+                }
+                
+                // 收集期望解决方式
+                const solutionCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+                const expectedSolutions = Array.from(solutionCheckboxes).map(cb => {
+                    const solutionMap = {
+                        'stop-infringement': '要求停止侵权行为',
+                        'compensation': '要求经济赔偿',
+                        'public-apology': '要求公开道歉',
+                        'legal-action': '提起法律诉讼'
+                    };
+                    return solutionMap[cb.value] || cb.value;
+                });
+                
+                // 处理 registrationId - 转换为整数或 null
+                let registrationId = null;
+                if (dataProperty.value && dataProperty.value !== 'other') {
+                    const parsedId = parseInt(dataProperty.value, 10);
+                    if (!isNaN(parsedId)) {
+                        registrationId = parsedId;
+                    }
+                }
+                
+                const protectionData = {
+                    title: document.getElementById('caseTitle').value.trim(),
+                    applicantName: document.getElementById('applicantName').value.trim(),
+                    applicantPhone: document.getElementById('applicantPhone').value.trim(),
+                    registrationId: registrationId,
+                    registrationTitle: registrationTitle,
+                    infringementType: document.getElementById('infringementType').value,
+                    description: document.getElementById('infringementDescription').value.trim(),
+                    infringerInfo: document.getElementById('infringerInfo')?.value?.trim() || '',
+                    expectedSolution: expectedSolutions.join(', ') || '待确认'
+                };
+                
+                console.log('[Protect] 准备提交的数据:', protectionData);
+                console.log('[Protect] JSON格式:', JSON.stringify(protectionData));
+                
+                // 检查必要字段
+                if (!protectionData.title) {
+                    throw new Error('案件标题为空，请检查表单');
+                }
+                
+                // Submit to API
+                console.log('[Protect] 调用ProtectionAPI.create...');
+                let result;
+                try {
+                    result = await ProtectionAPI.create(protectionData);
+                } catch (apiError) {
+                    console.error('[Protect] API调用异常:', apiError);
+                    console.error('[Protect] 错误详情:', apiError.stack);
+                    throw new Error(`API调用失败: ${apiError.message || '请检查网络连接'}`);
+                }
+                
+                console.log('[Protect] API返回原始数据:', result);
+                console.log('[Protect] API返回类型:', typeof result);
+                
+                if (!result) {
+                    throw new Error('API返回空值，请检查后端服务');
+                }
+                
+                if (!result.success) {
+                    throw new Error(result.message || result.error || '提交失败，请检查填写信息');
+                }
+                
+                if (!result.data || !result.data.caseNo) {
+                    throw new Error('API返回数据异常，缺少案件编号');
+                }
+                
+                alert(`维权申请提交成功！案件编号：${result.data.caseNo}\n我们将在2小时内联系您，请保持电话畅通。`);
+                closeProtectionModal();
+                
+                // Reload protection cases
+                loadProtectionCases();
+                
+            } catch (error) {
+                console.error('[Protect] 提交维权申请失败:', error);
+                
+                // 详细错误信息
+                let errorDetail = '';
+                if (error.name === 'TypeError') {
+                    errorDetail = '网络请求失败，请检查后端服务是否运行';
+                } else if (error.message && error.message.includes('401')) {
+                    errorDetail = '登录已过期，请重新登录';
+                } else if (error.message && error.message.includes('400')) {
+                    errorDetail = '请求参数错误，请检查填写信息';
+                } else {
+                    errorDetail = error.message || '未知错误';
+                }
+                
+                alert(`提交失败: ${errorDetail}\n\n请检查并重试，或联系管理员。\n\n技术详情请查看浏览器控制台(F12)`);
+            }
+        }
+
+        // Show legal consultation
+        function showLegalConsultation() {
+            document.getElementById('consultationModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close consultation modal
+        function closeConsultationModal() {
+            document.getElementById('consultationModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Submit consultation
+        async function submitConsultation() {
+            const type = document.getElementById('consultationType').value;
+            const question = document.getElementById('consultationQuestion').value;
+            const contact = document.getElementById('consultationContact').value;
+            
+            if (!question.trim() || !contact.trim()) {
+                alert('请填写咨询问题和联系方式');
+                return;
+            }
+            
+            // 检查是否已登录
+            if (!ApiService.isLoggedIn()) {
+                alert('请先登录后再提交咨询');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const submitBtn = document.querySelector('#consultationModal button[onclick="submitConsultation()"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '提交中...';
+                }
+                
+                const result = await ConsultationAPI.submit({
+                    type,
+                    question: question.trim(),
+                    contact: contact.trim()
+                });
+                
+                if (result.success) {
+                    alert('咨询提交成功！专业律师将在2小时内回复您的问题。');
+                    closeConsultationModal();
+                    // 刷新统计数据
+                    loadConsultationStats();
+                } else {
+                    alert(result.message || '提交失败');
+                }
+            } catch (error) {
+                console.error('提交咨询失败:', error);
+                alert('提交失败: ' + (error.message || '请稍后重试'));
+            } finally {
+                const submitBtn = document.querySelector('#consultationModal button[onclick="submitConsultation()"]');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '提交咨询';
+                }
+            }
+        }
+
+        // Start consultation
+        function startConsultation() {
+            showLegalConsultation();
+        }
+
+        // Handle alert
+        function handleAlert(type) {
+            alert(`处理${type}类型的警报，详细功能即将推出！`);
+        }
+
+        // View case detail
+        async function viewCaseDetail(caseId) {
+            console.log('[Protect] 查看案件详情:', caseId);
+            
+            const modal = document.getElementById('caseDetailModal');
+            const content = document.getElementById('caseDetailContent');
+            
+            // 显示加载状态
+            content.innerHTML = '<div class="text-center py-8 text-gray-400">加载中...</div>';
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            try {
+                // 从API获取案件详情
+                const result = await ProtectionAPI.getDetail(caseId);
+                console.log('[Protect] 案件详情:', result);
+                
+                if (result.success && result.data) {
+                    const c = result.data;
+                    content.innerHTML = `
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center pb-4 border-b border-gray-700">
+                                <div>
+                                    <div class="text-sm text-gray-400">案号</div>
+                                    <div class="font-mono text-lg">${c.case_no || '-'}</div>
+                                </div>
+                                <span class="status-badge status-${c.status}">${getStatusText(c.status)}</span>
+                            </div>
+                            
+                            <div>
+                                <div class="text-sm text-gray-400 mb-1">案件标题</div>
+                                <div class="text-lg font-bold">${c.title || '未命名案件'}</div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <div class="text-sm text-gray-400 mb-1">申请人</div>
+                                    <div>${c.applicant_name || '-'}</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-400 mb-1">联系电话</div>
+                                    <div>${c.applicant_phone || '-'}</div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="text-sm text-gray-400 mb-1">侵权类型</div>
+                                <div>${getInfringementTypeText(c.infringement_type)}</div>
+                            </div>
+                            
+                            ${c.registration_title ? `
+                            <div>
+                                <div class="text-sm text-gray-400 mb-1">涉案数据产权</div>
+                                <div>${c.registration_title}</div>
+                            </div>
+                            ` : ''}
+                            
+                            <div>
+                                <div class="text-sm text-gray-400 mb-1">侵权描述</div>
+                                <div class="p-3 bg-gray-800 rounded-lg text-sm">${c.description || '暂无描述'}</div>
+                            </div>
+                            
+                            ${c.infringer_info ? `
+                            <div>
+                                <div class="text-sm text-gray-400 mb-1">侵权方信息</div>
+                                <div class="p-3 bg-gray-800 rounded-lg text-sm">${c.infringer_info}</div>
+                            </div>
+                            ` : ''}
+                            
+                            ${c.expected_solution ? `
+                            <div>
+                                <div class="text-sm text-gray-400 mb-1">期望解决方式</div>
+                                <div class="p-3 bg-gray-800 rounded-lg text-sm">${c.expected_solution}</div>
+                            </div>
+                            ` : ''}
+                            
+                            <div class="pt-4 border-t border-gray-700">
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-gray-400">处理进度</span>
+                                    <span class="text-blue-400">${c.progress || 0}%</span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: ${c.progress || 0}%"></div>
+                                </div>
+                            </div>
+                            
+                            ${c.handle_comment ? `
+                            <div class="p-3 bg-blue-900 bg-opacity-20 rounded-lg border border-blue-700">
+                                <div class="text-sm text-blue-400 mb-1">处理意见</div>
+                                <div class="text-sm">${c.handle_comment}</div>
+                            </div>
+                            ` : ''}
+                            
+                            <div class="grid grid-cols-2 gap-4 text-xs text-gray-500 pt-4">
+                                <div>创建时间：${c.created_at ? new Date(c.created_at).toLocaleString('zh-CN') : '-'}</div>
+                                <div>更新时间：${c.updated_at ? new Date(c.updated_at).toLocaleString('zh-CN') : '-'}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = `
+                        <div class="text-center py-8 text-red-400">
+                            <p>获取案件详情失败</p>
+                            <p class="text-sm mt-2">${result.message || '请稍后重试'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('[Protect] 获取案件详情失败:', error);
+                content.innerHTML = `
+                    <div class="text-center py-8 text-red-400">
+                        <p>获取案件详情失败</p>
+                        <p class="text-sm mt-2">${error.message || '请检查网络连接'}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Close case detail modal
+        function closeCaseDetailModal() {
+            document.getElementById('caseDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Track case - 直接打开详情查看进度
+        function trackCase(caseId) {
+            console.log('[Protect] 跟踪案件进度:', caseId);
+            viewCaseDetail(caseId);
+        }
+
+        // Get infringement type display text
+        function getInfringementTypeText(type) {
+            const typeMap = {
+                'copyright': '著作权侵权',
+                'trademark': '商标侵权',
+                'trade_secret': '商业秘密侵权',
+                'trade-secret': '商业秘密侵权',
+                'data_breach': '数据泄露',
+                'data-breach': '数据泄露',
+                'unauthorized_use': '未经授权使用',
+                'unauthorized-use': '未经授权使用',
+                'other': '其他侵权'
+            };
+            return typeMap[type] || type || '未知类型';
+        }
+
+        // Download guidelines
+        function downloadGuidelines() {
+            alert('维权指南下载功能即将推出！');
+        }
+    </script>
+</body>
+</html>

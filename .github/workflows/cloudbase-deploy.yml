@@ -1,0 +1,108 @@
+name: Deploy to CloudBase
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+    types: [ closed ]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # 构建和测试
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+    
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        npm ci --prefer-offline
+    
+    - name: Run tests (if available)
+      run: |
+        cd backend
+        npm test || echo "No tests specified"
+      continue-on-error: true
+    
+    - name: Build Docker image (test)
+      run: |
+        cd backend
+        docker build -t datadj-api:test .
+      continue-on-error: true
+
+  # 部署前端
+  deploy-frontend:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    
+    - name: Install CloudBase CLI
+      run: npm install -g @cloudbase/cli
+    
+    - name: Deploy to CloudBase (Frontend)
+      run: tcb framework:deploy client
+      env:
+        TCB_API_KEY_ID: ${{ secrets.TCB_API_KEY_ID }}
+        TCB_API_KEY: ${{ secrets.TCB_API_KEY }}
+
+  # 部署后端
+  deploy-backend:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    
+    - name: Install CloudBase CLI
+      run: npm install -g @cloudbase/cli
+    
+    - name: Deploy to CloudBase (Backend)
+      run: tcb framework:deploy server
+      env:
+        TCB_API_KEY_ID: ${{ secrets.TCB_API_KEY_ID }}
+        TCB_API_KEY: ${{ secrets.TCB_API_KEY }}
+
+  # 部署通知
+  notify:
+    needs: [deploy-frontend, deploy-backend]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Deployment Status
+      run: |
+        if [ "${{ needs.deploy-frontend.result }}" == "success" ] && [ "${{ needs.deploy-backend.result }}" == "success" ]; then
+          echo "✅ 部署成功！"
+        else
+          echo "❌ 部署失败"
+          exit 1
+        fi

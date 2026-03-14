@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录诊断 - 天津数据产权登记服务平台</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 200px; overflow: auto; }
+        .error { color: red; }
+        .success { color: green; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        input { padding: 10px; margin: 5px; width: 200px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>后台登录诊断工具</h1>
+        
+        <h2>环境检查</h2>
+        <div id="envCheck"></div>
+        
+        <h2>登录测试</h2>
+        <div>
+            <input type="text" id="phone" value="admin" placeholder="账号"><br>
+            <input type="password" id="password" value="admin123" placeholder="密码"><br>
+            <button onclick="testLogin()">测试登录</button>
+            <button onclick="checkToken()">检查Token</button>
+            <button onclick="clearToken()">清除Token</button>
+            <button onclick="goToAdmin()">进入管理后台</button>
+        </div>
+        
+        <h2>日志</h2>
+        <div id="log" class="log"></div>
+        
+        <h2>操作</h2>
+        <button onclick="location.reload()">刷新页面</button>
+        <a href="login.html">返回登录页</a>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3002/api';
+        const logEl = document.getElementById('log');
+        
+        function log(msg, isError) {
+            const div = document.createElement('div');
+            div.textContent = new Date().toLocaleTimeString() + ': ' + msg;
+            div.className = isError ? 'error' : '';
+            logEl.appendChild(div);
+            console.log(msg);
+        }
+        
+        // 环境检查
+        function checkEnv() {
+            const envCheck = document.getElementById('envCheck');
+            let html = '<ul>';
+            
+            // 检查fetch
+            html += '<li>fetch API: ' + (window.fetch ? '✅ 支持' : '❌ 不支持') + '</li>';
+            
+            // 检查localStorage
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                html += '<li>localStorage: ✅ 可用</li>';
+            } catch(e) {
+                html += '<li>localStorage: ❌ 不可用 - ' + e.message + '</li>';
+            }
+            
+            // 检查Promise
+            html += '<li>Promise: ' + (window.Promise ? '✅ 支持' : '❌ 不支持') + '</li>';
+            
+            // 检查async/await
+            try {
+                eval('async function test() {}');
+                html += '<li>Async/Await: ✅ 支持</li>';
+            } catch(e) {
+                html += '<li>Async/Await: ❌ 不支持</li>';
+            }
+            
+            // 当前token
+            const token = localStorage.getItem('adminToken');
+            html += '<li>当前Token: ' + (token ? token.substring(0, 50) + '...' : '无') + '</li>';
+            
+            html += '</ul>';
+            envCheck.innerHTML = html;
+        }
+        
+        async function testLogin() {
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            
+            log('开始登录测试...');
+            log('账号: ' + phone);
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, password })
+                });
+                
+                log('响应状态: ' + response.status);
+                
+                const result = await response.json();
+                log('响应数据: ' + JSON.stringify(result).substring(0, 200));
+                
+                if (result.success) {
+                    log('✅ 登录成功', false);
+                    log('角色: ' + result.data.user.role);
+                    log('保存token...');
+                    localStorage.setItem('adminToken', result.data.token);
+                    log('✅ Token已保存');
+                } else {
+                    log('❌ 登录失败: ' + result.message, true);
+                }
+            } catch (error) {
+                log('❌ 请求错误: ' + error.message, true);
+            }
+        }
+        
+        function checkToken() {
+            const token = localStorage.getItem('adminToken');
+            if (token) {
+                log('Token存在: ' + token.substring(0, 50) + '...');
+            } else {
+                log('Token不存在');
+            }
+        }
+        
+        function clearToken() {
+            localStorage.removeItem('adminToken');
+            log('Token已清除');
+        }
+        
+        function goToAdmin() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                log('❌ 没有token，请先登录', true);
+                return;
+            }
+            log('跳转到管理后台...');
+            window.location.href = 'index.html';
+        }
+        
+        // 页面加载时检查环境
+        checkEnv();
+        log('诊断页面加载完成');
+    </script>
+</body>
+</html>

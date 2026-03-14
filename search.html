@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查询公示 - 天津数据产权登记服务平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="js/components/simple-layout.js"></script>
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #3b82f6;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --error-red: #ef4444;
+            --neutral-gray: #6b7280;
+            --light-gray: #f3f4f6;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-2px);
+            color: #3b82f6;
+        }
+        
+        .search-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .filter-tag {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .filter-tag:hover {
+            background: rgba(59, 130, 246, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .filter-tag.active {
+            background: rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        
+        .result-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-approved {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .data-type-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .pagination-btn:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .pagination-btn.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .advanced-search-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .advanced-search-panel.expanded {
+            max-height: 500px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .trend-chart {
+            height: 300px;
+        }
+    </style>
+</head>
+<body class="text-white" data-current-page="search">
+    <!-- Header Container -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <main class="page-content">
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Page Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4">数据产权查询公示</h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    一站式搜索服务，可视化信息展示，全方位了解数据资产状况，为数据交易、合作提供决策参考
+                </p>
+            </div>
+
+            <!-- Search Section -->
+            <div class="glass-card p-6 rounded-2xl mb-8">
+                <div class="flex flex-col lg:flex-row gap-4 mb-6">
+                    <div class="flex-1">
+                        <input type="text" id="searchInput" class="search-input w-full px-4 py-3 rounded-lg" placeholder="请输入关键词搜索数据产权信息...">
+                    </div>
+                    <button onclick="performSearch()" class="btn-primary px-8 py-3 rounded-lg font-medium">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        搜索
+                    </button>
+                </div>
+
+                <!-- Advanced Search Panel -->
+                <div id="advancedSearchPanel" class="advanced-search-panel">
+                    <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-600">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">数据类型</label>
+                            <select id="dataTypeFilter" class="search-input w-full px-3 py-2 rounded-lg text-sm">
+                                <option value="">全部类型</option>
+                                <option value="financial">金融数据</option>
+                                <option value="medical">医疗数据</option>
+                                <option value="traffic">交通数据</option>
+                                <option value="education">教育数据</option>
+                                <option value="industrial">工业数据</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">登记状态</label>
+                            <select id="statusFilter" class="search-input w-full px-3 py-2 rounded-lg text-sm">
+                                <option value="">全部状态</option>
+                                <option value="approved">已通过</option>
+                                <option value="pending">审核中</option>
+                                <option value="rejected">已拒绝</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">时间范围</label>
+                            <select id="timeFilter" class="search-input w-full px-3 py-2 rounded-lg text-sm">
+                                <option value="">全部时间</option>
+                                <option value="week">最近一周</option>
+                                <option value="month">最近一月</option>
+                                <option value="quarter">最近三月</option>
+                                <option value="year">最近一年</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">数据规模</label>
+                            <select id="sizeFilter" class="search-input w-full px-3 py-2 rounded-lg text-sm">
+                                <option value="">全部规模</option>
+                                <option value="small">小型 (< 1GB)</option>
+                                <option value="medium">中型 (1GB - 100GB)</option>
+                                <option value="large">大型 (100GB - 1TB)</option>
+                                <option value="extra-large">超大型 (> 1TB)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-4 space-x-3">
+                        <button onclick="resetFilters()" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg text-sm transition-colors">
+                            重置
+                        </button>
+                        <button onclick="applyFilters()" class="btn-primary px-4 py-2 rounded-lg text-sm">
+                            应用筛选
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Filters -->
+                <div class="flex flex-wrap gap-3 mt-4">
+                    <span class="text-sm text-gray-300">快速筛选：</span>
+                    <span class="filter-tag px-3 py-1 rounded-full text-sm" data-filter="hot">热门数据</span>
+                    <span class="filter-tag px-3 py-1 rounded-full text-sm" data-filter="recent">最新登记</span>
+                    <span class="filter-tag px-3 py-1 rounded-full text-sm" data-filter="high-value">高价值数据</span>
+                    <span class="filter-tag px-3 py-1 rounded-full text-sm" data-filter="public">公开数据</span>
+                </div>
+            </div>
+
+            <!-- Statistics Overview -->
+            <div class="grid md:grid-cols-4 gap-6 mb-8">
+                <div class="glass-card p-6 rounded-2xl text-center">
+                    <div class="text-3xl font-bold text-blue-400 mb-2" id="totalCount">-</div>
+                    <div class="text-gray-300">登记总数</div>
+                </div>
+                <div class="glass-card p-6 rounded-2xl text-center">
+                    <div class="text-3xl font-bold text-green-400 mb-2" id="approvedCount">-</div>
+                    <div class="text-gray-300">已通过</div>
+                </div>
+                <div class="glass-card p-6 rounded-2xl text-center">
+                    <div class="text-3xl font-bold text-yellow-400 mb-2" id="pendingCount">-</div>
+                    <div class="text-gray-300">审核中</div>
+                </div>
+                <div class="glass-card p-6 rounded-2xl text-center">
+                    <div class="text-3xl font-bold text-purple-400 mb-2" id="todayCount">-</div>
+                    <div class="text-gray-300">今日新增</div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-4 gap-8">
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+                    <!-- Search Results -->
+                    <div class="glass-card p-6 rounded-2xl mb-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold">搜索结果</h2>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-sm text-gray-300">排序方式：</span>
+                                <select id="sortOrder" class="search-input px-3 py-1 rounded text-sm" onchange="sortResults()">
+                                    <option value="relevance">相关度</option>
+                                    <option value="date">登记时间</option>
+                                    <option value="name">名称排序</option>
+                                    <option value="popularity">热度排序</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="searchResults" class="space-y-4">
+                            <!-- Search results will be populated here -->
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="flex justify-center items-center space-x-2 mt-8" id="pagination">
+                            <!-- Pagination will be generated here -->
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Quick Stats -->
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-lg font-bold mb-4">热门数据类型</h3>
+                        <div class="space-y-3" id="hotCategories">
+                            <div class="text-center text-gray-400 py-4">加载中...</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Registrations -->
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-lg font-bold mb-4">最新登记</h3>
+                        <div class="space-y-3" id="recentRegistrations">
+                            <!-- Recent registrations will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Bookmarked Items -->
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-lg font-bold mb-4">我的收藏</h3>
+                        <div class="space-y-3" id="bookmarkedItems">
+                            <!-- Bookmarked items will be populated here -->
+                        </div>
+                        <button onclick="window.location.href='user.html'" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 py-2 rounded-lg text-sm transition-colors">
+                            管理收藏
+                        </button>
+                    </div>
+
+                    <!-- Help Information -->
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-lg font-bold mb-4">使用帮助</h3>
+                        <div class="space-y-2 text-sm text-gray-300">
+                            <p>• 使用关键词搜索数据产权信息</p>
+                            <p>• 通过高级搜索进行精确筛选</p>
+                            <p>• 点击数据卡片查看详细信息</p>
+                            <p>• 收藏感兴趣的数据产权</p>
+                            <p>• 对公示数据提出异议</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </main>
+
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-card p-8 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold" id="modalTitle">数据产权详情</h3>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="modalContent">
+                <!-- Modal content will be populated here -->
+            </div>
+            
+            <div class="flex justify-end space-x-4 mt-8">
+                <button onclick="toggleBookmark()" id="bookmarkBtn" class="bg-yellow-600 hover:bg-yellow-700 px-6 py-2 rounded-lg transition-colors">
+                    收藏
+                </button>
+                <button onclick="submitObjection()" class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg transition-colors">
+                    提出异议
+                </button>
+                <button onclick="requestUsage()" class="btn-primary px-6 py-2 rounded-lg">
+                    申请使用
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Objection Modal -->
+    <div id="objectionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="glass-card p-8 rounded-2xl max-w-2xl w-full">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">提出异议</h3>
+                <button onclick="closeObjectionModal()" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="objectionForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">异议类型 *</label>
+                    <select id="objectionType" class="search-input w-full px-4 py-3 rounded-lg" required>
+                        <option value="">请选择异议类型</option>
+                        <option value="ownership">权属争议</option>
+                        <option value="accuracy">信息不准确</option>
+                        <option value="duplicate">重复登记</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">异议理由 *</label>
+                    <textarea id="objectionReason" class="search-input w-full px-4 py-3 rounded-lg h-32" placeholder="请详细说明您的异议理由..." required></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">证明材料</label>
+                    <input type="file" id="objectionEvidence" class="search-input w-full px-4 py-3 rounded-lg" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                    <p class="text-sm text-gray-300 mt-1">支持PDF、Word、图片格式，每个文件最大5MB</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">联系方式 *</label>
+                    <input type="text" id="objectionContact" class="search-input w-full px-4 py-3 rounded-lg" placeholder="请输入您的联系方式" required>
+                </div>
+                
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button type="button" onclick="closeObjectionModal()" class="bg-gray-600 hover:bg-gray-700 px-6 py-2 rounded-lg transition-colors">
+                        取消
+                    </button>
+                    <button type="submit" class="btn-primary px-6 py-2 rounded-lg">
+                        提交异议
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth-check.js"></script>
+    <script src="main.js"></script>
+    <script>
+        // Search page specific functionality
+        let currentPage = 1;
+        let pageSize = 10;
+        let totalPages = 1;
+        let currentResults = [];
+        let selectedItem = null;
+        let bookmarkedItems = [];
+
+        // Initialize search page
+        let pageInitialized = false;
+        async function initializePage() {
+            if (pageInitialized) {
+                console.log('[Search] 页面已初始化，跳过');
+                return;
+            }
+            pageInitialized = true;
+            
+            console.log('[Search] 开始初始化页面...');
+            
+            // 初始化布局
+            if (typeof initLayoutSimple === 'function') {
+                try {
+                    await initLayoutSimple({ currentPage: 'search' });
+                } catch (e) {
+                    console.error('[Search] 布局初始化失败:', e);
+                }
+            } else {
+                console.warn('[Search] initLayoutSimple 函数不可用');
+            }
+            
+            await loadInitialData();
+            loadRecentRegistrations();
+            loadBookmarkedItems();
+            setupEventListeners();
+            
+            console.log('[Search] 页面初始化完成');
+        }
+
+        // 立即开始初始化（脚本已在页面底部，DOM已就绪）
+        initializePage();
+
+        // Load initial data from API
+        async function loadInitialData() {
+            console.log('[Search] 开始加载数据...');
+            try {
+                // 并行加载登记列表和统计数据
+                const [listResult, statsResult] = await Promise.all([
+                    RegistrationAPI.getList({ status: 'approved', page: 1, pageSize: 100 }),
+                    RegistrationAPI.getStats()
+                ]);
+                
+                console.log('[Search] 列表API返回:', listResult);
+                console.log('[Search] 统计API返回:', statsResult);
+                
+                // 处理登记列表数据
+                if (listResult.success && listResult.data) {
+                    currentResults = listResult.data.list.map(item => ({
+                        id: item.id,
+                        title: item.title,
+                        type: item.categoryText || item.category,
+                        holder: item.holder_name,
+                        registerTime: item.created_at,
+                        status: item.status,
+                        description: item.description || item.application_scene,
+                        dataSize: item.dataSizeText || item.data_size,
+                        updateFrequency: item.update_frequency,
+                        dataFormat: item.data_format,
+                        applicationScene: item.application_scene,
+                        value: 5000000 + Math.floor(Math.random() * 10000000),
+                        popularity: 60 + Math.floor(Math.random() * 40)
+                    }));
+                    
+                    totalPages = Math.ceil(currentResults.length / pageSize);
+                    console.log(`[Search] 加载了 ${currentResults.length} 条数据`);
+                    
+                    displayResults();
+                    updatePagination();
+                    loadRecentRegistrations();
+                } else {
+                    console.warn('[Search] 列表API返回失败:', listResult.message);
+                }
+                
+                // 处理统计数据
+                if (statsResult.success && statsResult.data) {
+                    updateStatisticsDisplay(statsResult.data);
+                } else {
+                    console.warn('[Search] 统计API返回失败:', statsResult.message);
+                }
+                
+            } catch (error) {
+                console.error('[Search] 加载数据失败:', error);
+                document.getElementById('searchResults').innerHTML = 
+                    '<div class="text-center py-12 text-red-400">加载数据失败，请稍后重试</div>';
+            }
+        }
+        
+        // 更新统计数据展示
+        function updateStatisticsDisplay(stats) {
+            console.log('[Search] 更新统计显示:', stats);
+            
+            // 更新顶部统计卡片
+            const totalCountEl = document.getElementById('totalCount');
+            const approvedCountEl = document.getElementById('approvedCount');
+            const pendingCountEl = document.getElementById('pendingCount');
+            const todayCountEl = document.getElementById('todayCount');
+            
+            if (totalCountEl) totalCountEl.textContent = (stats.total_count || 0).toLocaleString();
+            if (approvedCountEl) approvedCountEl.textContent = (stats.approved_count || 0).toLocaleString();
+            if (pendingCountEl) pendingCountEl.textContent = (stats.pending_count || 0).toLocaleString();
+            if (todayCountEl) todayCountEl.textContent = (stats.today_count || 0).toLocaleString();
+            
+            // 更新热门数据类型
+            updateHotCategories(stats.categoryStats);
+        }
+        
+        // 更新热门数据类型
+        function updateHotCategories(categoryStats) {
+            const container = document.getElementById('hotCategories');
+            if (!container) return;
+            
+            const categoryColors = {
+                'financial': { name: '金融数据', color: 'text-blue-400', bg: 'bg-blue-400' },
+                'medical': { name: '医疗数据', color: 'text-green-400', bg: 'bg-green-400' },
+                'traffic': { name: '交通数据', color: 'text-purple-400', bg: 'bg-purple-400' },
+                'education': { name: '教育数据', color: 'text-orange-400', bg: 'bg-orange-400' },
+                'industrial': { name: '工业数据', color: 'text-red-400', bg: 'bg-red-400' },
+                'other': { name: '其他数据', color: 'text-gray-400', bg: 'bg-gray-400' }
+            };
+            
+            if (!categoryStats || categoryStats.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 py-4">暂无数据</div>';
+                return;
+            }
+            
+            // 按数量排序并取前5个
+            const sorted = categoryStats.sort((a, b) => b.count - a.count).slice(0, 5);
+            const maxCount = sorted[0].count;
+            
+            container.innerHTML = sorted.map(item => {
+                const config = categoryColors[item.category] || { name: item.category, color: 'text-blue-400', bg: 'bg-blue-400' };
+                const percentage = maxCount > 0 ? (item.count / maxCount * 100) : 0;
+                
+                return `
+                    <div class="mb-3">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-gray-300">${config.name}</span>
+                            <span class="${config.color} font-bold">${item.count.toLocaleString()}</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="${config.bg} h-2 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            console.log(`[Search] 更新了 ${sorted.length} 个热门类型`);
+        }
+
+        // Display search results
+        function displayResults() {
+            const container = document.getElementById('searchResults');
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const pageResults = currentResults.slice(startIndex, endIndex);
+            
+            if (pageResults.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.467-.881-6.08-2.33m0 0l-.431-.43A7.963 7.963 0 016 10a7.963 7.963 0 016-2.292c1.65 0 3.18.43 4.572 1.136m0 0l.431.43A7.963 7.963 0 0118 10c0 1.255-.34 2.43-.928 3.46M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.467-.881-6.08-2.33"></path>
+                        </svg>
+                        <h3 class="text-xl font-bold mb-2">未找到相关数据</h3>
+                        <p class="text-gray-300">请尝试使用其他关键词或调整搜索条件</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = pageResults.map(item => `
+                <div class="result-card glass-card p-6 rounded-xl border border-gray-600" onclick="showDetail('${item.id}')">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="data-type-icon bg-blue-600">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-1">${item.title}</h3>
+                                <div class="flex items-center space-x-4 text-sm text-gray-300">
+                                    <span>数据类型：${item.type}</span>
+                                    <span>登记时间：${item.registerTime}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="status-badge status-${item.status}">${getStatusText(item.status)}</span>
+                            <button onclick="event.stopPropagation(); toggleBookmarkItem('${item.id}')" class="text-yellow-400 hover:text-yellow-300">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-300 mb-4">${item.description}</p>
+                    
+                    <div class="grid md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <span class="text-gray-400">所属机构/单位：</span>
+                            <span class="font-medium">${item.holder}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400">数据规模：</span>
+                            <span class="font-medium">${item.dataSize || '未指定'}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400">更新频率：</span>
+                            <span class="font-medium">${item.updateFrequency || '未指定'}</span>
+                        </div>
+                    </div>
+                    
+                    ${item.value ? `
+                    <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-600">
+                        <div class="text-sm">
+                            <span class="text-gray-400">预估价值：</span>
+                            <span class="text-green-400 font-bold">¥${(item.value / 10000).toFixed(0)}万</span>
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            热度：${item.popularity || 0}%
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Get status display text
+        function getStatusText(status) {
+            const statusMap = {
+                'approved': '已通过',
+                'pending': '审核中',
+                'rejected': '已拒绝'
+            };
+            return statusMap[status] || '未知状态';
+        }
+
+        // Update pagination
+        function updatePagination() {
+            const container = document.getElementById('pagination');
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            paginationHTML += `
+                <button class="pagination-btn ${currentPage === 1 ? 'disabled' : ''}" 
+                        onclick="changePage(${currentPage - 1})" 
+                        ${currentPage === 1 ? 'disabled' : ''}>
+                    上一页
+                </button>
+            `;
+            
+            // First page and ellipsis
+            if (startPage > 1) {
+                paginationHTML += `<button class="pagination-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    paginationHTML += `<span class="px-2 text-gray-400">...</span>`;
+                }
+            }
+            
+            // Page numbers
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+                    <button class="pagination-btn ${i === currentPage ? 'active' : ''}" 
+                            onclick="changePage(${i})">
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            // Last page and ellipsis
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += `<span class="px-2 text-gray-400">...</span>`;
+                }
+                paginationHTML += `<button class="pagination-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+            
+            // Next button
+            paginationHTML += `
+                <button class="pagination-btn ${currentPage === totalPages ? 'disabled' : ''}" 
+                        onclick="changePage(${currentPage + 1})" 
+                        ${currentPage === totalPages ? 'disabled' : ''}>
+                    下一页
+                </button>
+            `;
+            
+            container.innerHTML = paginationHTML;
+        }
+
+        // Change page
+        function changePage(page) {
+            if (page < 1 || page > totalPages || page === currentPage) return;
+            
+            currentPage = page;
+            displayResults();
+            updatePagination();
+            
+            // Scroll to top of results
+            document.getElementById('searchResults').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Perform search
+        async function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            
+            if (!searchTerm) {
+                loadInitialData();
+                return;
+            }
+            
+            try {
+                const result = await RegistrationAPI.getList({ 
+                    keyword: searchTerm,
+                    status: 'approved',
+                    page: 1, 
+                    pageSize: 100 
+                });
+                
+                if (result.success) {
+                    currentResults = result.data.list.map(item => ({
+                        id: item.id,
+                        title: item.title,
+                        type: item.categoryText || item.category,
+                        holder: item.holder_name,
+                        registerTime: item.created_at,
+                        status: item.status,
+                        description: item.description || item.application_scene,
+                        dataSize: item.dataSizeText || item.data_size,
+                        updateFrequency: item.update_frequency,
+                        dataFormat: item.data_format,
+                        applicationScene: item.application_scene,
+                        value: 5000000 + Math.floor(Math.random() * 10000000),
+                        popularity: 60 + Math.floor(Math.random() * 40)
+                    }));
+                    
+                    currentPage = 1;
+                    totalPages = Math.ceil(currentResults.length / pageSize);
+                    displayResults();
+                    updatePagination();
+                }
+            } catch (error) {
+                console.error('搜索失败:', error);
+                document.getElementById('searchResults').innerHTML = 
+                    '<div class="text-center py-12 text-red-400">搜索失败，请稍后重试</div>';
+            }
+        }
+
+        // Show advanced search
+        function showAdvancedSearch() {
+            const panel = document.getElementById('advancedSearchPanel');
+            panel.classList.toggle('expanded');
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const dataType = document.getElementById('dataTypeFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const timeRange = document.getElementById('timeFilter').value;
+            const size = document.getElementById('sizeFilter').value;
+            
+            // Apply filters to current results
+            let filteredResults = [...currentResults];
+            
+            if (dataType) {
+                filteredResults = filteredResults.filter(item => 
+                    item.type.toLowerCase().includes(dataType.toLowerCase())
+                );
+            }
+            
+            if (status) {
+                filteredResults = filteredResults.filter(item => item.status === status);
+            }
+            
+            // Add more filter logic as needed
+            
+            currentResults = filteredResults;
+            currentPage = 1;
+            totalPages = Math.ceil(currentResults.length / pageSize);
+            displayResults();
+            updatePagination();
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('dataTypeFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('timeFilter').value = '';
+            document.getElementById('sizeFilter').value = '';
+            
+            loadInitialData();
+        }
+
+        // Sort results
+        function sortResults() {
+            const sortBy = document.getElementById('sortOrder').value;
+            
+            switch(sortBy) {
+                case 'date':
+                    currentResults.sort((a, b) => new Date(b.registerTime) - new Date(a.registerTime));
+                    break;
+                case 'name':
+                    currentResults.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+                case 'popularity':
+                    currentResults.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+                    break;
+                default:
+                    // Relevance - keep original order
+                    break;
+            }
+            
+            displayResults();
+        }
+
+        // Load recent registrations
+        function loadRecentRegistrations() {
+            const container = document.getElementById('recentRegistrations');
+            const recentItems = currentResults.slice(0, 5);
+            
+            container.innerHTML = recentItems.map(item => `
+                <div class="flex items-center space-x-3 p-2 bg-white bg-opacity-5 rounded-lg cursor-pointer hover:bg-opacity-10" onclick="showDetail('${item.id}')">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium text-sm truncate">${item.title}</div>
+                        <div class="text-xs text-gray-300">${item.registerTime}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load bookmarked items
+        function loadBookmarkedItems() {
+            try {
+                bookmarkedItems = (typeof PlatformApp !== 'undefined' && PlatformApp.Storage) 
+                    ? (PlatformApp.Storage.get('bookmarkedItems') || []) 
+                    : [];
+            } catch (e) {
+                console.warn('[Search] 无法加载收藏:', e);
+                bookmarkedItems = [];
+            }
+            const container = document.getElementById('bookmarkedItems');
+            
+            if (bookmarkedItems.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-sm">暂无收藏的数据</p>';
+                return;
+            }
+            
+            container.innerHTML = bookmarkedItems.map(itemId => {
+                const item = currentResults.find(r => r.id === itemId);
+                if (!item) return '';
+                
+                return `
+                    <div class="flex items-center space-x-3 p-2 bg-white bg-opacity-5 rounded-lg">
+                        <div class="w-8 h-8 bg-yellow-600 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium text-sm truncate">${item.title}</div>
+                            <div class="text-xs text-gray-300">${item.type}</div>
+                        </div>
+                        <button onclick="removeBookmark('${item.id}')" class="text-red-400 hover:text-red-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search input enter key
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Filter tags
+            document.querySelectorAll('.filter-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    // Apply filter logic here
+                });
+            });
+            
+            // Objection form
+            document.getElementById('objectionForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitObjectionForm();
+            });
+        }
+
+        // Show detail modal
+        async function showDetail(itemId) {
+            // 先显示加载状态
+            document.getElementById('modalTitle').textContent = '加载中...';
+            document.getElementById('modalContent').innerHTML = '<div class="text-center py-8"><div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div><p class="mt-4 text-gray-300">加载详情中...</p></div>';
+            document.getElementById('detailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            try {
+                // 从后端API获取完整的登记信息
+                const response = await fetch(`${API_BASE_URL}/registrations/${itemId}`);
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message || '获取详情失败');
+                }
+                
+                const item = result.data;
+                selectedItem = item;
+                
+                // 映射字段显示文本
+                const categoryText = {
+                    'financial': '金融数据',
+                    'medical': '医疗数据',
+                    'traffic': '交通数据',
+                    'education': '教育数据',
+                    'industrial': '工业数据',
+                    'other': '其他数据'
+                }[item.category] || item.category;
+                
+                const dataTypeText = {
+                    'structured': '结构化数据',
+                    'unstructured': '非结构化数据',
+                    'semi-structured': '半结构化数据',
+                    'real-time': '实时数据'
+                }[item.data_type] || item.data_type;
+                
+                const dataSizeText = {
+                    'small': '小型 (< 1GB)',
+                    'medium': '中型 (1GB - 100GB)',
+                    'large': '大型 (100GB - 1TB)',
+                    'extra-large': '超大型 (> 1TB)'
+                }[item.data_size] || item.data_size;
+                
+                const frequencyText = {
+                    'real-time': '实时更新',
+                    'daily': '每日更新',
+                    'weekly': '每周更新',
+                    'monthly': '每月更新',
+                    'quarterly': '每季更新',
+                    'yearly': '每年更新',
+                    'static': '静态数据'
+                }[item.update_frequency] || item.update_frequency;
+                
+                const statusText = {
+                    'pending': '待审核',
+                    'reviewing': '审核中',
+                    'approved': '已通过',
+                    'rejected': '已驳回',
+                    'revoked': '已撤销'
+                }[item.status] || item.status;
+                
+                document.getElementById('modalTitle').textContent = item.title;
+                document.getElementById('modalContent').innerHTML = `
+                    <div class="space-y-6">
+                        <!-- 基本信息区域 -->
+                        <div class="glass-card p-4 rounded-lg bg-white bg-opacity-5">
+                            <h4 class="font-bold mb-4 text-blue-400 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                基本信息
+                            </h4>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">登记编号：</span>
+                                    <span class="font-mono">${item.registration_no}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">数据分类：</span>
+                                    <span>${categoryText}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">数据类型：</span>
+                                    <span>${dataTypeText}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">登记状态：</span>
+                                    <span class="status-badge status-${item.status}">${statusText}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">所属机构/单位：</span>
+                                    <span>${item.holder_name || '-'}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">联系电话：</span>
+                                    <span>${item.holder_phone || '-'}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">登记时间：</span>
+                                    <span>${item.created_at ? new Date(item.created_at).toLocaleString('zh-CN') : '-'}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">更新时间：</span>
+                                    <span>${item.updated_at ? new Date(item.updated_at).toLocaleString('zh-CN') : '-'}</span>
+                                </div>
+                                ${item.published_at ? `
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">公示时间：</span>
+                                    <span>${new Date(item.published_at).toLocaleString('zh-CN')}</span>
+                                </div>
+                                ` : ''}
+                                ${item.expires_at ? `
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">有效期至：</span>
+                                    <span>${new Date(item.expires_at).toLocaleString('zh-CN')}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <!-- 技术规格区域 -->
+                        <div class="glass-card p-4 rounded-lg bg-white bg-opacity-5">
+                            <h4 class="font-bold mb-4 text-green-400 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+                                </svg>
+                                技术规格
+                            </h4>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">数据规模：</span>
+                                    <span>${dataSizeText || '-'}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">更新频率：</span>
+                                    <span>${frequencyText || '-'}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">数据格式：</span>
+                                    <span>${item.data_format || '-'}</span>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">数据来源：</span>
+                                    <span>${item.data_source || '-'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 应用价值区域 -->
+                        <div class="glass-card p-4 rounded-lg bg-white bg-opacity-5">
+                            <h4 class="font-bold mb-4 text-purple-400 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                应用价值
+                            </h4>
+                            <div class="space-y-4 text-sm">
+                                <div>
+                                    <span class="text-gray-300 block mb-1">应用场景：</span>
+                                    <p class="text-white bg-gray-800 bg-opacity-50 p-3 rounded">${item.application_scene || '暂无说明'}</p>
+                                </div>
+                                <div>
+                                    <span class="text-gray-300 block mb-1">预期价值：</span>
+                                    <p class="text-white bg-gray-800 bg-opacity-50 p-3 rounded">${item.expected_value || '暂无评估'}</p>
+                                </div>
+                                <div>
+                                    <span class="text-gray-300 block mb-1">详细描述：</span>
+                                    <p class="text-white bg-gray-800 bg-opacity-50 p-3 rounded">${item.description || '暂无描述'}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 审核信息区域 -->
+                        ${item.review_comment ? `
+                        <div class="glass-card p-4 rounded-lg bg-white bg-opacity-5">
+                            <h4 class="font-bold mb-4 text-yellow-400 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                审核信息
+                            </h4>
+                            <div class="text-sm">
+                                <div class="flex justify-between border-b border-gray-700 pb-2 mb-2">
+                                    <span class="text-gray-300">审核结论：</span>
+                                    <span>${item.review_comment}</span>
+                                </div>
+                                ${item.reviewed_at ? `
+                                <div class="flex justify-between border-b border-gray-700 pb-2">
+                                    <span class="text-gray-300">审核时间：</span>
+                                    <span>${new Date(item.reviewed_at).toLocaleString('zh-CN')}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <!-- 附件文件 -->
+                        ${item.files && item.files.length > 0 ? `
+                        <div class="glass-card p-4 rounded-lg bg-white bg-opacity-5">
+                            <h4 class="font-bold mb-4 text-orange-400 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                </svg>
+                                附件文件 (${item.files.length})
+                            </h4>
+                            <div class="space-y-2">
+                                ${item.files.map(file => `
+                                    <div class="flex items-center justify-between p-3 bg-gray-800 bg-opacity-50 rounded text-sm">
+                                        <div class="flex items-center space-x-3">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                            <span class="text-gray-300">${file.file_name}</span>
+                                        </div>
+                                        <a href="${file.file_url}" target="_blank" class="text-blue-400 hover:text-blue-300 text-xs">
+                                            下载查看
+                                        </a>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <!-- 统计信息 -->
+                        <div class="glass-card p-4 rounded-lg bg-white bg-opacity-5">
+                            <h4 class="font-bold mb-4 text-gray-400 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                统计信息
+                            </h4>
+                            <div class="grid md:grid-cols-3 gap-4 text-sm">
+                                <div class="text-center p-3 bg-gray-800 bg-opacity-50 rounded">
+                                    <div class="text-2xl font-bold text-blue-400">${item.view_count || 0}</div>
+                                    <div class="text-gray-400">浏览次数</div>
+                                </div>
+                                <div class="text-center p-3 bg-gray-800 bg-opacity-50 rounded">
+                                    <div class="text-2xl font-bold text-yellow-400">${item.bookmark_count || 0}</div>
+                                    <div class="text-gray-400">收藏次数</div>
+                                </div>
+                                <div class="text-center p-3 bg-gray-800 bg-opacity-50 rounded">
+                                    <div class="text-2xl font-bold text-green-400">${item.isBookmarked ? '已收藏' : '未收藏'}</div>
+                                    <div class="text-gray-400">我的收藏</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Update bookmark button
+                const isBookmarked = bookmarkedItems.includes(item.id) || item.isBookmarked;
+                const bookmarkBtn = document.getElementById('bookmarkBtn');
+                bookmarkBtn.textContent = isBookmarked ? '取消收藏' : '收藏';
+                bookmarkBtn.className = isBookmarked ? 
+                    'bg-yellow-600 hover:bg-yellow-700 px-6 py-2 rounded-lg transition-colors' :
+                    'bg-gray-600 hover:bg-gray-700 px-6 py-2 rounded-lg transition-colors';
+                
+            } catch (error) {
+                console.error('获取详情失败:', error);
+                document.getElementById('modalContent').innerHTML = `
+                    <div class="text-center py-8 text-red-400">
+                        <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p>获取详情失败</p>
+                        <p class="text-sm text-gray-400 mt-2">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Close detail modal
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            selectedItem = null;
+        }
+
+        // Toggle bookmark
+        function toggleBookmark() {
+            if (!selectedItem) return;
+            
+            const index = bookmarkedItems.indexOf(selectedItem.id);
+            if (index > -1) {
+                bookmarkedItems.splice(index, 1);
+            } else {
+                bookmarkedItems.push(selectedItem.id);
+            }
+            
+            PlatformApp.Storage.set('bookmarkedItems', bookmarkedItems);
+            loadBookmarkedItems();
+            
+            // Update button
+            const isBookmarked = bookmarkedItems.includes(selectedItem.id);
+            const bookmarkBtn = document.getElementById('bookmarkBtn');
+            bookmarkBtn.textContent = isBookmarked ? '取消收藏' : '收藏';
+            bookmarkBtn.className = isBookmarked ? 
+                'bg-yellow-600 hover:bg-yellow-700 px-6 py-2 rounded-lg transition-colors' :
+                'bg-gray-600 hover:bg-gray-700 px-6 py-2 rounded-lg transition-colors';
+        }
+
+        // Toggle bookmark item
+        function toggleBookmarkItem(itemId) {
+            const index = bookmarkedItems.indexOf(itemId);
+            if (index > -1) {
+                bookmarkedItems.splice(index, 1);
+            } else {
+                bookmarkedItems.push(itemId);
+            }
+            
+            try {
+                if (typeof PlatformApp !== 'undefined' && PlatformApp.Storage) {
+                    PlatformApp.Storage.set('bookmarkedItems', bookmarkedItems);
+                }
+            } catch (e) {
+                console.warn('[Search] 无法保存收藏:', e);
+            }
+            loadBookmarkedItems();
+        }
+
+        // Remove bookmark
+        function removeBookmark(itemId) {
+            const index = bookmarkedItems.indexOf(itemId);
+            if (index > -1) {
+                bookmarkedItems.splice(index, 1);
+                try {
+                    if (typeof PlatformApp !== 'undefined' && PlatformApp.Storage) {
+                        PlatformApp.Storage.set('bookmarkedItems', bookmarkedItems);
+                    }
+                } catch (e) {
+                    console.warn('[Search] 无法保存收藏:', e);
+                }
+                loadBookmarkedItems();
+            }
+        }
+
+        // Submit objection
+        function submitObjection() {
+            if (!selectedItem) return;
+            
+            document.getElementById('objectionModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close objection modal
+        function closeObjectionModal() {
+            document.getElementById('objectionModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            document.getElementById('objectionForm').reset();
+        }
+
+        // Submit objection form
+        function submitObjectionForm() {
+            const type = document.getElementById('objectionType').value;
+            const reason = document.getElementById('objectionReason').value;
+            const contact = document.getElementById('objectionContact').value;
+            
+            if (!type || !reason || !contact) {
+                alert('请填写所有必填项');
+                return;
+            }
+            
+            // Simulate submission
+            alert('异议提交成功！我们将在3个工作日内处理您的异议。');
+            closeObjectionModal();
+        }
+
+        // Request usage
+        function requestUsage() {
+            if (!selectedItem) return;
+            
+            alert('使用申请功能即将推出，敬请期待！');
+        }
+    </script>
+</body>
+</html>

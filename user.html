@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户中心 - 天津数据产权登记服务平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="js/components/simple-layout.js"></script>
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #3b82f6;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --error-red: #ef4444;
+            --neutral-gray: #6b7280;
+            --light-gray: #f3f4f6;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-2px);
+            color: #3b82f6;
+        }
+        
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .tab-button {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab-button.active {
+            border-bottom-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .role-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .role-card.selected {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .step-indicator {
+            position: relative;
+        }
+        
+        .step-indicator::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, transparent);
+            transform: translateY(-50%);
+        }
+        
+        .step-indicator:last-child::after {
+            display: none;
+        }
+        
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="text-white" data-layout-init data-current-page="user">
+    <div id="header-container"></div>
+
+    <main class="page-content pt-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- User Header -->
+            <div class="glass-card p-8 rounded-2xl mb-8">
+                <div class="flex items-center space-x-6">
+                    <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <img src="resources/user-avatar.jpg" alt="用户头像" class="w-18 h-18 rounded-full object-cover">
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2" id="userName">张三</h1>
+                        <div class="flex items-center space-x-4 text-sm text-gray-300">
+                            <span id="userRole">数据持有方</span>
+                            <span id="verifiedBadge" class="text-gray-400">● 未实名认证</span>
+                            <span id="registerTime">注册时间：2024-01-15</span>
+                        </div>
+                    </div>
+                    <div class="ml-auto flex space-x-4">
+                        <button onclick="showSettings()" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg transition-colors">
+                            账户设置
+                        </button>
+                        <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors">
+                            退出登录
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex space-x-8 mb-8 border-b border-gray-600">
+                <button onclick="switchTab('dashboard')" class="tab-button active px-4 py-3 font-medium" id="dashboard-tab">
+                    工作台
+                </button>
+                <button onclick="switchTab('registration')" class="tab-button px-4 py-3 font-medium" id="registration-tab">
+                    我的登记
+                </button>
+                <button onclick="switchTab('profile')" class="tab-button px-4 py-3 font-medium" id="profile-tab">
+                    个人信息
+                </button>
+                <button onclick="switchTab('security')" class="tab-button px-4 py-3 font-medium" id="security-tab">
+                    安全设置
+                </button>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboard-content" class="tab-content">
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Quick Actions -->
+                    <div class="lg:col-span-2">
+                        <!-- 认证提示区域 -->
+                        <div id="verificationAlert" class="hidden glass-card p-6 rounded-2xl mb-8 border-l-4 border-yellow-500 bg-yellow-500 bg-opacity-10">
+                            <div class="flex items-start space-x-4">
+                                <svg class="w-6 h-6 text-yellow-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-bold text-yellow-400 mb-2">完成实名认证后才能使用登记服务</h3>
+                                    <p class="text-gray-300 mb-4">为保障数据产权登记的真实性和合规性，您需要先完成实名认证才能提交数据产权登记申请。</p>
+                                    <button onclick="switchTab('verification')" class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-lg transition-colors text-sm">
+                                        立即认证
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl mb-8">
+                            <h2 class="text-2xl font-bold mb-6">快捷操作</h2>
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <button id="btnDataRegister" onclick="handleDataRegister()" class="bg-blue-600 hover:bg-blue-700 p-6 rounded-xl text-center transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                                    <svg class="w-8 h-8 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    <div class="font-medium">数据登记</div>
+                                </button>
+                                <button onclick="window.location.href='search.html'" class="bg-green-600 hover:bg-green-700 p-6 rounded-xl text-center transition-all transform hover:scale-105">
+                                    <svg class="w-8 h-8 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    <div class="font-medium">数据查询</div>
+                                </button>
+                                <button onclick="window.location.href='protect.html'" class="bg-purple-600 hover:bg-purple-700 p-6 rounded-xl text-center transition-all transform hover:scale-105">
+                                    <svg class="w-8 h-8 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                    </svg>
+                                    <div class="font-medium">维权服务</div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activities -->
+                        <div class="glass-card p-6 rounded-2xl">
+                            <h2 class="text-2xl font-bold mb-6">最近活动</h2>
+                            <div class="space-y-4" id="recentActivities">
+                                <!-- Activities will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="space-y-6">
+                        <div class="glass-card p-6 rounded-2xl">
+                            <h3 class="text-xl font-bold mb-4">统计概览</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-300">登记数量</span>
+                                    <span class="text-2xl font-bold text-blue-400" id="registrationCount">12</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-300">审核通过</span>
+                                    <span class="text-2xl font-bold text-green-400" id="approvedCount">8</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-300">审核中</span>
+                                    <span class="text-2xl font-bold text-yellow-400" id="pendingCount">3</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-300">维权申请</span>
+                                    <span class="text-2xl font-bold text-purple-400" id="protectionCount">1</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl">
+                            <h3 class="text-xl font-bold mb-4">消息通知</h3>
+                            <div class="space-y-3" id="notifications">
+                                <!-- Notifications will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registration Tab -->
+            <div id="registration-content" class="tab-content hidden">
+                <div class="glass-card p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">我的登记记录</h2>
+                        <button onclick="window.location.href='register.html'" class="btn-primary px-6 py-2 rounded-lg font-medium">
+                            新建登记
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-600">
+                                    <th class="text-left py-3 px-4">登记名称</th>
+                                    <th class="text-left py-3 px-4">数据类型</th>
+                                    <th class="text-left py-3 px-4">提交时间</th>
+                                    <th class="text-left py-3 px-4">状态</th>
+                                    <th class="text-left py-3 px-4">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="registrationTable">
+                                <!-- Registration data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profile-content" class="tab-content hidden">
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h2 class="text-2xl font-bold mb-6">基本信息</h2>
+                        <form id="profileForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">姓名</label>
+                                <input type="text" id="profileName" class="form-input w-full px-4 py-3 rounded-lg" value="张三">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">手机号</label>
+                                <input type="tel" id="profilePhone" class="form-input w-full px-4 py-3 rounded-lg" value="138****8888">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">邮箱</label>
+                                <input type="email" id="profileEmail" class="form-input w-full px-4 py-3 rounded-lg" value="zhang@example.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">所属机构</label>
+                                <input type="text" id="profileOrg" class="form-input w-full px-4 py-3 rounded-lg" value="天津市大数据管理中心">
+                            </div>
+                            <button type="submit" class="btn-primary w-full py-3 rounded-lg font-medium">
+                                保存修改
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h2 class="text-2xl font-bold mb-6">实名认证</h2>
+                        <div class="space-y-6">
+                            <!-- 个人身份认证 -->
+                            <div id="personalAuthBox" class="flex items-center justify-between p-4 bg-gray-600 bg-opacity-20 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <svg id="personalAuthIcon" class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                    </svg>
+                                    <div>
+                                        <div class="font-medium">个人身份认证</div>
+                                        <div id="personalAuthStatus" class="text-sm text-gray-300">未认证</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span id="personalAuthLabel" class="text-gray-400">未认证</span>
+                                    <button id="personalAuthBtn" onclick="showPersonalAuthForm()" class="text-blue-400 hover:text-blue-300 text-sm">
+                                        立即认证
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 个人认证表单 -->
+                            <div id="personalAuthForm" class="hidden space-y-4 p-4 bg-white bg-opacity-5 rounded-lg">
+                                <h3 class="font-medium text-lg">提交个人身份认证</h3>
+                                <form id="personalVerifyForm" class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">真实姓名</label>
+                                        <input type="text" id="personalRealName" class="form-input w-full px-4 py-2 rounded-lg" placeholder="请输入您的真实姓名" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">身份证号</label>
+                                        <input type="text" id="personalIdCard" class="form-input w-full px-4 py-2 rounded-lg" placeholder="请输入18位身份证号码" maxlength="18" required>
+                                    </div>
+                                    
+                                    <!-- 身份证上传 -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">身份证正面</label>
+                                            <div class="relative">
+                                                <input type="file" id="idCardFront" accept="image/*" class="hidden" onchange="handleIdCardUpload(this, 'idCardFrontPreview', 'idCardFrontUrl')">
+                                                <label for="idCardFront" class="cursor-pointer block">
+                                                    <div id="idCardFrontPreview" class="aspect-[3/2] bg-gray-700 bg-opacity-50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-500 hover:border-blue-400 transition-colors">
+                                                        <div class="text-center">
+                                                            <svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                                            </svg>
+                                                            <span class="text-xs text-gray-400">点击上传正面</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            <input type="hidden" id="idCardFrontUrl">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">身份证反面</label>
+                                            <div class="relative">
+                                                <input type="file" id="idCardBack" accept="image/*" class="hidden" onchange="handleIdCardUpload(this, 'idCardBackPreview', 'idCardBackUrl')">
+                                                <label for="idCardBack" class="cursor-pointer block">
+                                                    <div id="idCardBackPreview" class="aspect-[3/2] bg-gray-700 bg-opacity-50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-500 hover:border-blue-400 transition-colors">
+                                                        <div class="text-center">
+                                                            <svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                                            </svg>
+                                                            <span class="text-xs text-gray-400">点击上传反面</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            <input type="hidden" id="idCardBackUrl">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex space-x-3">
+                                        <button type="submit" class="btn-primary flex-1 py-2 rounded-lg font-medium">
+                                            提交认证
+                                        </button>
+                                        <button type="button" onclick="hidePersonalAuthForm()" class="bg-gray-600 hover:bg-gray-700 flex-1 py-2 rounded-lg font-medium transition-colors">
+                                            取消
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- 企业认证 -->
+                            <div id="enterpriseAuthBox" class="flex items-center justify-between p-4 bg-gray-600 bg-opacity-20 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <svg id="enterpriseAuthIcon" class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                    <div>
+                                        <div class="font-medium">企业认证</div>
+                                        <div id="enterpriseAuthStatus" class="text-sm text-gray-300">未认证</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span id="enterpriseAuthLabel" class="text-gray-400">未认证</span>
+                                    <button id="enterpriseAuthBtn" onclick="showEnterpriseAuthForm()" class="text-blue-400 hover:text-blue-300 text-sm">
+                                        立即认证
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 企业认证表单 -->
+                            <div id="enterpriseAuthForm" class="hidden space-y-4 p-4 bg-white bg-opacity-5 rounded-lg">
+                                <h3 class="font-medium text-lg">提交企业认证</h3>
+                                <form id="enterpriseVerifyForm" class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">企业名称</label>
+                                        <input type="text" id="enterpriseName" class="form-input w-full px-4 py-2 rounded-lg" placeholder="请输入企业全称" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">统一社会信用代码</label>
+                                        <input type="text" id="creditCode" class="form-input w-full px-4 py-2 rounded-lg" placeholder="请输入18位统一社会信用代码" maxlength="18" required>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">法人姓名</label>
+                                            <input type="text" id="legalPersonName" class="form-input w-full px-4 py-2 rounded-lg" placeholder="法人姓名" required>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">法人身份证号</label>
+                                            <input type="text" id="legalPersonIdCard" class="form-input w-full px-4 py-2 rounded-lg" placeholder="法人身份证号" maxlength="18" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 企业材料上传 -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">企业营业执照</label>
+                                            <div class="relative">
+                                                <input type="file" id="businessLicense" accept="image/*" class="hidden" onchange="handleIdCardUpload(this, 'businessLicensePreview', 'businessLicenseUrl')">
+                                                <label for="businessLicense" class="cursor-pointer block">
+                                                    <div id="businessLicensePreview" class="aspect-[3/2] bg-gray-700 bg-opacity-50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-500 hover:border-blue-400 transition-colors">
+                                                        <div class="text-center">
+                                                            <svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                                            </svg>
+                                                            <span class="text-xs text-gray-400">点击上传营业执照</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            <input type="hidden" id="businessLicenseUrl">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">加盖公章授权函</label>
+                                            <div class="relative">
+                                                <input type="file" id="authorizationLetter" accept="image/*" class="hidden" onchange="handleIdCardUpload(this, 'authorizationLetterPreview', 'authorizationLetterUrl')">
+                                                <label for="authorizationLetter" class="cursor-pointer block">
+                                                    <div id="authorizationLetterPreview" class="aspect-[3/2] bg-gray-700 bg-opacity-50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-500 hover:border-blue-400 transition-colors">
+                                                        <div class="text-center">
+                                                            <svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                                            </svg>
+                                                            <span class="text-xs text-gray-400">点击上传授权函</span>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                            <input type="hidden" id="authorizationLetterUrl">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex space-x-3">
+                                        <button type="submit" class="btn-primary flex-1 py-2 rounded-lg font-medium">
+                                            提交认证
+                                        </button>
+                                        <button type="button" onclick="hideEnterpriseAuthForm()" class="bg-gray-600 hover:bg-gray-700 flex-1 py-2 rounded-lg font-medium transition-colors">
+                                            取消
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- 认证申请记录 -->
+                            <div id="verificationHistory" class="hidden border-t border-gray-600 pt-4">
+                                <h3 class="font-medium mb-3">认证申请记录</h3>
+                                <div id="verificationHistoryList" class="space-y-2">
+                                    <!-- 动态加载 -->
+                                </div>
+                            </div>
+
+                            <div class="border-t border-gray-600 pt-6">
+                                <h3 class="font-medium mb-3">认证优势</h3>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li>• 提高数据产权登记可信度</li>
+                                    <li>• 获得更多平台服务功能</li>
+                                    <li>• 享受优先审核通道</li>
+                                    <li>• 参与数据要素市场交易</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Tab -->
+            <div id="security-content" class="tab-content hidden">
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h2 class="text-2xl font-bold mb-6">密码安全</h2>
+                        <form id="passwordForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">当前密码</label>
+                                <input type="password" class="form-input w-full px-4 py-3 rounded-lg" placeholder="请输入当前密码">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">新密码</label>
+                                <input type="password" class="form-input w-full px-4 py-3 rounded-lg" placeholder="请输入新密码">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">确认新密码</label>
+                                <input type="password" class="form-input w-full px-4 py-3 rounded-lg" placeholder="请再次输入新密码">
+                            </div>
+                            <button type="submit" class="btn-primary w-full py-3 rounded-lg font-medium">
+                                修改密码
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h2 class="text-2xl font-bold mb-6">登录保护</h2>
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between p-4 bg-green-600 bg-opacity-20 rounded-lg">
+                                <div>
+                                    <div class="font-medium">手机验证</div>
+                                    <div class="text-sm text-gray-300">登录时需要手机验证码</div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-gray-600 bg-opacity-20 rounded-lg">
+                                <div>
+                                    <div class="font-medium">邮箱验证</div>
+                                    <div class="text-sm text-gray-300">重要操作需要邮箱确认</div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+
+                            <div class="border-t border-gray-600 pt-6">
+                                <h3 class="font-medium mb-3">安全提示</h3>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li>• 定期更换密码，使用复杂密码组合</li>
+                                    <li>• 开启双重验证提高账户安全性</li>
+                                    <li>• 不要在公共设备上保存登录状态</li>
+                                    <li>• 及时更新安全设置和联系方式</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <!-- Registration Modal -->
+    <div id="registrationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="glass-card p-8 rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">数据产权登记</h3>
+                <button onclick="hideRegistrationModal()" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Registration Steps -->
+            <div class="flex items-center justify-between mb-8">
+                <div class="step-indicator flex items-center">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                    <span class="ml-2 text-sm">选择类型</span>
+                </div>
+                <div class="step-indicator flex items-center">
+                    <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                    <span class="ml-2 text-sm">填写信息</span>
+                </div>
+                <div class="step-indicator flex items-center">
+                    <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                    <span class="ml-2 text-sm">上传材料</span>
+                </div>
+                <div class="step-indicator flex items-center">
+                    <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-sm font-bold">4</div>
+                    <span class="ml-2 text-sm">提交审核</span>
+                </div>
+            </div>
+            
+            <div id="registrationForm">
+                <!-- Registration form content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js?v=2"></script>
+    <script src="js/auth-check.js?v=2"></script>
+    <script src="main.js"></script>
+    <script>
+        // User page specific functionality
+        let currentUser = null;
+        let currentTab = 'dashboard';
+
+        // Initialize user page
+        async function initializePage() {
+            try {
+                console.log('[User] 开始初始化用户中心...');
+                
+                // 验证 API 方法是否存在
+                console.log('[User] AuthAPI.getActivities:', typeof AuthAPI.getActivities);
+                console.log('[User] AuthAPI.getNotifications:', typeof AuthAPI.getNotifications);
+                
+                // 初始化布局
+                if (typeof initLayoutSimple === 'function') {
+                    try {
+                        await initLayoutSimple({ currentPage: 'user' });
+                    } catch (e) {
+                        console.warn('[User] 布局初始化失败:', e);
+                    }
+                }
+                
+                // 检查登录状态
+                const authInfo = checkLoginStatus();
+                if (!authInfo) {
+                    console.log('[User] 未登录，重定向到首页');
+                    return;
+                }
+                console.log('[User] 已登录，用户:', authInfo.user?.username);
+                
+                // 加载用户数据
+                await loadUserData();
+                
+                // 加载仪表盘数据
+                await loadDashboardData();
+                
+                // 初始化表单
+                initializeForms();
+                
+                console.log('[User] 用户中心初始化完成');
+            } catch (error) {
+                console.error('[User] 初始化失败:', error);
+                alert('页面初始化失败，请刷新页面重试');
+            }
+        }
+
+        initializePage();
+
+        // Load user data from API
+        async function loadUserData() {
+            try {
+                console.log('[User] 开始加载用户数据...');
+                const result = await AuthAPI.getCurrentUser();
+                console.log('[User] 用户数据API返回:', result);
+                
+                if (!result.success) {
+                    throw new Error(result.message || '获取用户信息失败');
+                }
+                
+                currentUser = result.data;
+                
+                // 更新用户信息显示
+                const userNameEl = document.getElementById('userName');
+                const userRoleEl = document.getElementById('userRole');
+                const registerTimeEl = document.getElementById('registerTime');
+                
+                if (userNameEl) userNameEl.textContent = currentUser.username || '-';
+                if (userRoleEl) userRoleEl.textContent = getRoleText(currentUser.role);
+                if (registerTimeEl && currentUser.register_time) {
+                    registerTimeEl.textContent = `注册时间：${new Date(currentUser.register_time).toLocaleDateString('zh-CN')}`;
+                }
+                
+                // Update profile form
+                const profileNameEl = document.getElementById('profileName');
+                const profilePhoneEl = document.getElementById('profilePhone');
+                const profileEmailEl = document.getElementById('profileEmail');
+                const profileOrgEl = document.getElementById('profileOrg');
+                
+                if (profileNameEl) profileNameEl.value = currentUser.username || '';
+                if (profilePhoneEl) profilePhoneEl.value = currentUser.phone || '';
+                if (profileEmailEl) profileEmailEl.value = currentUser.email || '';
+                if (profileOrgEl) profileOrgEl.value = currentUser.organization || '';
+                
+                // 更新统计数字
+                if (currentUser.stats) {
+                    const regCountEl = document.getElementById('registrationCount');
+                    const apprCountEl = document.getElementById('approvedCount');
+                    const pendCountEl = document.getElementById('pendingCount');
+                    const protCountEl = document.getElementById('protectionCount');
+                    
+                    if (regCountEl) regCountEl.textContent = currentUser.stats.registrationCount || 0;
+                    if (apprCountEl) apprCountEl.textContent = currentUser.stats.approvedCount || 0;
+                    if (pendCountEl) pendCountEl.textContent = currentUser.stats.pendingCount || 0;
+                    if (protCountEl) protCountEl.textContent = currentUser.stats.protectionCount || 0;
+                }
+                
+                // 更新实名认证状态
+                updateVerificationStatus(currentUser);
+                
+                console.log('[User] 用户数据加载完成');
+            } catch (error) {
+                console.error('[User] 获取用户信息失败:', error);
+                alert('获取用户信息失败，请重新登录');
+                AuthAPI.logout();
+                window.location.href = 'index.html';
+            }
+        }
+
+        // 用户认证状态
+        let userVerificationInfo = {
+            verified: false,
+            realName: null,
+            organization: null
+        };
+
+        // 处理数据登记按钮点击
+        function handleDataRegister() {
+            if (!userVerificationInfo.verified) {
+                alert('您尚未完成实名认证，请先完成认证后再提交登记申请');
+                switchTab('verification');
+                return;
+            }
+            if (!userVerificationInfo.realName || !userVerificationInfo.organization) {
+                alert('您的认证信息不完整，请完善个人信息后再提交');
+                switchTab('verification');
+                return;
+            }
+            window.location.href = 'register.html';
+        }
+
+        // Update verification status display
+        function updateVerificationStatus(userData) {
+            const verified = userData.verified === 1 || userData.verified === true;
+            const realName = userData.real_name || userData.realName;
+            const organization = userData.organization;
+            
+            // 保存认证信息供全局使用
+            userVerificationInfo = {
+                verified: verified,
+                realName: realName,
+                organization: organization
+            };
+
+            const verifiedBadge = document.getElementById('verifiedBadge');
+            const personalAuthBox = document.getElementById('personalAuthBox');
+            const personalAuthIcon = document.getElementById('personalAuthIcon');
+            const personalAuthStatus = document.getElementById('personalAuthStatus');
+            const personalAuthLabel = document.getElementById('personalAuthLabel');
+            const verificationAlert = document.getElementById('verificationAlert');
+            const btnDataRegister = document.getElementById('btnDataRegister');
+            
+            if (verified) {
+                // 已认证状态
+                if (verifiedBadge) {
+                    verifiedBadge.className = 'text-green-400';
+                    verifiedBadge.innerHTML = '● 已实名认证';
+                }
+                if (personalAuthBox) {
+                    personalAuthBox.className = 'flex items-center justify-between p-4 bg-green-600 bg-opacity-20 rounded-lg';
+                }
+                if (personalAuthIcon) {
+                    personalAuthIcon.className = 'w-6 h-6 text-green-400';
+                    personalAuthIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+                }
+                if (personalAuthStatus) {
+                    personalAuthStatus.textContent = '已通过认证';
+                }
+                if (personalAuthLabel) {
+                    personalAuthLabel.className = 'text-green-400';
+                    personalAuthLabel.textContent = '已认证';
+                }
+                // 隐藏认证提示，启用登记按钮
+                if (verificationAlert) {
+                    verificationAlert.classList.add('hidden');
+                }
+                if (btnDataRegister) {
+                    btnDataRegister.disabled = false;
+                    btnDataRegister.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            } else {
+                // 未认证状态
+                if (verifiedBadge) {
+                    verifiedBadge.className = 'text-gray-400';
+                    verifiedBadge.innerHTML = '● 未实名认证';
+                }
+                if (personalAuthBox) {
+                    personalAuthBox.className = 'flex items-center justify-between p-4 bg-gray-600 bg-opacity-20 rounded-lg';
+                }
+                if (personalAuthIcon) {
+                    personalAuthIcon.className = 'w-6 h-6 text-gray-400';
+                    personalAuthIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>';
+                }
+                if (personalAuthStatus) {
+                    personalAuthStatus.textContent = '未认证';
+                }
+                if (personalAuthLabel) {
+                    personalAuthLabel.className = 'text-gray-400';
+                    personalAuthLabel.textContent = '未认证';
+                }
+                // 显示认证提示，禁用登记按钮
+                if (verificationAlert) {
+                    verificationAlert.classList.remove('hidden');
+                }
+                if (btnDataRegister) {
+                    btnDataRegister.disabled = true;
+                    btnDataRegister.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        }
+
+        // Get role display text
+        function getRoleText(role) {
+            const roleMap = {
+                'data_holder': '数据持有方',
+                'data_user': '数据使用方',
+                'regulator': '监管方',
+                'admin': '管理员'
+            };
+            return roleMap[role] || '未知角色';
+        }
+
+        // Switch tab
+        function switchTab(tabName) {
+            // 特殊处理认证标签 - 跳转到个人信息并显示认证区域
+            if (tabName === 'verification') {
+                tabName = 'profile';
+                // 显示认证表单
+                setTimeout(() => {
+                    const personalAuthForm = document.getElementById('personalAuthForm');
+                    const enterpriseAuthForm = document.getElementById('enterpriseAuthForm');
+                    if (personalAuthForm && personalAuthForm.classList.contains('hidden')) {
+                        showPersonalAuthForm();
+                    }
+                    // 滚动到认证区域
+                    const profileContent = document.getElementById('profile-content');
+                    if (profileContent) {
+                        const authSection = profileContent.querySelector('.glass-card:nth-child(2)');
+                        if (authSection) {
+                            authSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                }, 100);
+            }
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const contentEl = document.getElementById(tabName + '-content');
+            const tabEl = document.getElementById(tabName + '-tab');
+            
+            if (contentEl) {
+                contentEl.classList.remove('hidden');
+            }
+            if (tabEl) {
+                tabEl.classList.add('active');
+            }
+            
+            currentTab = tabName;
+            
+            // Load tab specific data
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'registration':
+                    loadRegistrationData();
+                    break;
+                case 'profile':
+                    // Profile data is already loaded
+                    break;
+                case 'security':
+                    // Security settings are static
+                    break;
+            }
+        }
+
+        // Load dashboard data from API
+        async function loadDashboardData() {
+            try {
+                console.log('[User] 开始加载仪表盘数据...');
+                // 加载最近活动
+                await loadRecentActivities();
+                
+                // 加载通知
+                await loadNotifications();
+                
+                // 加载认证状态
+                await loadVerificationStatus();
+                
+                console.log('[User] 仪表盘数据加载完成');
+            } catch (error) {
+                console.error('[User] 加载仪表盘数据失败:', error);
+            }
+        }
+
+        // Load recent activities from API
+        async function loadRecentActivities() {
+            try {
+                console.log('[User] 开始加载活动记录...');
+                
+                // 检查 API 方法是否存在
+                if (typeof AuthAPI.getActivities !== 'function') {
+                    console.error('[User] AuthAPI.getActivities 方法不存在');
+                    document.getElementById('recentActivities').innerHTML = 
+                        '<div class="text-center text-gray-400 py-4">功能加载中，请刷新页面</div>';
+                    return;
+                }
+                
+                console.log('[User] Token:', ApiService.getToken() ? '存在' : '不存在');
+                const result = await AuthAPI.getActivities();
+                console.log('[User] 活动API返回:', result);
+                const container = document.getElementById('recentActivities');
+                
+                if (!result || !result.success) {
+                    console.warn('[User] 活动API返回失败:', result);
+                    container.innerHTML = '<div class="text-center text-gray-400 py-4">暂无活动记录</div>';
+                    return;
+                }
+                
+                if (!result.data || result.data.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-400 py-4">暂无活动记录</div>';
+                    return;
+                }
+                
+                const activities = result.data;
+                container.innerHTML = activities.map(activity => {
+                    const timeText = formatTimeAgo(activity.time);
+                    return `
+                        <div class="flex items-start space-x-4 p-4 bg-white bg-opacity-5 rounded-lg">
+                            <div class="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
+                            <div class="flex-1">
+                                <div class="font-medium">${activity.action}</div>
+                                <div class="text-sm text-gray-300 mt-1">${activity.detail || ''}</div>
+                                <div class="text-xs text-gray-400 mt-2">${timeText}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                console.log('[User] 活动记录加载完成，共', activities.length, '条');
+            } catch (error) {
+                console.error('[User] 加载活动记录失败:', error);
+                document.getElementById('recentActivities').innerHTML = 
+                    '<div class="text-center text-gray-400 py-4">加载失败: ' + (error.message || '未知错误') + '</div>';
+            }
+        }
+        
+        // Format time to relative time
+        // 支持 ISO 8601 格式 (2026-02-24T13:08:58.123Z) 和本地格式 (2026-02-24 21:08:58)
+        function formatTimeAgo(timeStr) {
+            if (!timeStr) return '-';
+            
+            // 统一处理：如果是本地格式 (含空格)，替换为T，确保能被正确解析
+            const isoStr = timeStr.replace(' ', 'T');
+            const date = new Date(isoStr);
+            const now = new Date();
+            const diff = now - date;
+            
+            // 检查日期是否有效
+            if (isNaN(date.getTime())) {
+                return timeStr;
+            }
+            
+            if (diff < 0) return '刚刚'; // 时间在未来，显示刚刚
+            
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return '刚刚';
+            if (minutes < 60) return `${minutes}分钟前`;
+            if (hours < 24) return `${hours}小时前`;
+            if (days < 30) return `${days}天前`;
+            return date.toLocaleDateString('zh-CN');
+        }
+
+        // Load notifications from API
+        async function loadNotifications() {
+            try {
+                console.log('[User] 开始加载通知...');
+                
+                // 检查 API 方法是否存在
+                if (typeof AuthAPI.getNotifications !== 'function') {
+                    console.error('[User] AuthAPI.getNotifications 方法不存在');
+                    document.getElementById('notifications').innerHTML = 
+                        '<div class="text-center text-gray-400 py-4">功能加载中，请刷新页面</div>';
+                    return;
+                }
+                
+                console.log('[User] Token:', ApiService.getToken() ? '存在' : '不存在');
+                const result = await AuthAPI.getNotifications();
+                console.log('[User] 通知API返回:', result);
+                const container = document.getElementById('notifications');
+                
+                if (!result || !result.success) {
+                    console.warn('[User] 通知API返回失败:', result);
+                    container.innerHTML = '<div class="text-center text-gray-400 py-4">暂无通知</div>';
+                    return;
+                }
+                
+                if (!result.data || result.data.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-400 py-4">暂无通知</div>';
+                    return;
+                }
+                
+                const notifications = result.data;
+                container.innerHTML = notifications.map(noti => {
+                    const timeText = formatTimeAgo(noti.time);
+                    return `
+                        <div class="p-3 bg-white bg-opacity-5 rounded-lg ${noti.read ? 'opacity-60' : ''}">
+                            <div class="font-medium text-sm">${noti.title}</div>
+                            <div class="text-xs text-gray-300 mt-1">${noti.content}</div>
+                            <div class="text-xs text-gray-400 mt-2">${timeText}</div>
+                        </div>
+                    `;
+                }).join('');
+                console.log('[User] 通知加载完成，共', notifications.length, '条');
+            } catch (error) {
+                console.error('[User] 加载通知失败:', error);
+                document.getElementById('notifications').innerHTML = 
+                    '<div class="text-center text-gray-400 py-4">加载失败: ' + (error.message || '未知错误') + '</div>';
+            }
+        }
+
+        // ==================== 实名认证功能 ====================
+        
+        // 加载用户认证状态
+        async function loadVerificationStatus() {
+            try {
+                console.log('[User] 加载认证状态...');
+                const result = await VerificationAPI.getStatus();
+                if (!result.success) {
+                    console.warn('[User] 获取认证状态失败:', result.message);
+                    return;
+                }
+                
+                const data = result.data;
+                console.log('[User] 认证状态:', data);
+                
+                // 更新个人认证显示
+                updatePersonalAuthUI(data);
+                
+                // 更新企业认证显示
+                updateEnterpriseAuthUI(data);
+                
+                // 显示认证申请记录
+                if (data.applications && data.applications.length > 0) {
+                    showVerificationHistory(data.applications);
+                }
+            } catch (error) {
+                console.error('[User] 加载认证状态失败:', error);
+            }
+        }
+        
+        // 更新个人认证UI
+        function updatePersonalAuthUI(data) {
+            const statusEl = document.getElementById('personalAuthStatus');
+            const labelEl = document.getElementById('personalAuthLabel');
+            const btnEl = document.getElementById('personalAuthBtn');
+            const iconEl = document.getElementById('personalAuthIcon');
+            
+            if (data.verified) {
+                statusEl.textContent = '已通过认证';
+                labelEl.textContent = '已认证';
+                labelEl.className = 'text-green-400';
+                btnEl.style.display = 'none';
+                iconEl.className = 'w-6 h-6 text-green-400';
+                iconEl.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+            } else {
+                const pendingApp = data.applications?.find(a => a.type === 'personal' && a.status === 'pending');
+                if (pendingApp) {
+                    statusEl.textContent = '审核中';
+                    labelEl.textContent = '审核中';
+                    labelEl.className = 'text-yellow-400';
+                    btnEl.textContent = '查看进度';
+                    btnEl.onclick = () => showVerificationDetail(pendingApp.id);
+                } else {
+                    statusEl.textContent = '未认证';
+                    labelEl.textContent = '未认证';
+                    labelEl.className = 'text-gray-400';
+                    btnEl.textContent = '立即认证';
+                    btnEl.onclick = showPersonalAuthForm;
+                }
+            }
+        }
+        
+        // 更新企业认证UI
+        function updateEnterpriseAuthUI(data) {
+            const statusEl = document.getElementById('enterpriseAuthStatus');
+            const labelEl = document.getElementById('enterpriseAuthLabel');
+            const btnEl = document.getElementById('enterpriseAuthBtn');
+            
+            // 检查是否有企业认证申请
+            const enterpriseApp = data.applications?.find(a => a.type === 'enterprise');
+            
+            if (enterpriseApp && enterpriseApp.status === 'approved') {
+                statusEl.textContent = '已通过认证';
+                labelEl.textContent = '已认证';
+                labelEl.className = 'text-green-400';
+                btnEl.style.display = 'none';
+            } else if (enterpriseApp && enterpriseApp.status === 'pending') {
+                statusEl.textContent = '审核中';
+                labelEl.textContent = '审核中';
+                labelEl.className = 'text-yellow-400';
+                btnEl.textContent = '查看进度';
+                btnEl.onclick = () => showVerificationDetail(enterpriseApp.id);
+            } else {
+                statusEl.textContent = '未认证';
+                labelEl.textContent = '未认证';
+                labelEl.className = 'text-gray-400';
+                btnEl.textContent = '立即认证';
+                btnEl.onclick = showEnterpriseAuthForm;
+            }
+        }
+        
+        // 显示认证申请记录
+        function showVerificationHistory(applications) {
+            const container = document.getElementById('verificationHistory');
+            const listEl = document.getElementById('verificationHistoryList');
+            
+            container.classList.remove('hidden');
+            
+            const statusMap = {
+                'pending': { text: '审核中', class: 'text-yellow-400' },
+                'approved': { text: '已通过', class: 'text-green-400' },
+                'rejected': { text: '未通过', class: 'text-red-400' }
+            };
+            
+            const typeMap = {
+                'personal': '个人认证',
+                'enterprise': '企业认证'
+            };
+            
+            listEl.innerHTML = applications.slice(0, 3).map(app => {
+                const status = statusMap[app.status];
+                return `
+                    <div class="flex justify-between items-center p-3 bg-white bg-opacity-5 rounded">
+                        <div>
+                            <span class="text-sm">${typeMap[app.type]}</span>
+                            <span class="text-xs text-gray-400 ml-2">${formatTimeAgo(app.createdAt)}</span>
+                        </div>
+                        <span class="text-sm ${status.class}">${status.text}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 显示/隐藏个人认证表单
+        function showPersonalAuthForm() {
+            document.getElementById('personalAuthForm').classList.remove('hidden');
+        }
+        
+        function hidePersonalAuthForm() {
+            document.getElementById('personalAuthForm').classList.add('hidden');
+        }
+        
+        // 显示/隐藏企业认证表单
+        function showEnterpriseAuthForm() {
+            document.getElementById('enterpriseAuthForm').classList.remove('hidden');
+        }
+        
+        function hideEnterpriseAuthForm() {
+            document.getElementById('enterpriseAuthForm').classList.add('hidden');
+        }
+        
+        // 处理身份证/材料图片上传（转为Base64）
+        function handleIdCardUpload(input, previewId, urlId) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // 检查文件大小（最大 5MB）
+            if (file.size > 5 * 1024 * 1024) {
+                alert('图片大小不能超过 5MB');
+                return;
+            }
+            
+            // 检查文件类型
+            if (!file.type.startsWith('image/')) {
+                alert('请上传图片文件');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                document.getElementById(urlId).value = base64;
+                
+                // 显示预览
+                const previewEl = document.getElementById(previewId);
+                previewEl.innerHTML = `<img src="${base64}" class="w-full h-full object-contain rounded">`;
+                previewEl.classList.remove('border-dashed');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // 处理个人认证表单提交
+        document.getElementById('personalVerifyForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const realName = document.getElementById('personalRealName').value.trim();
+            const idCard = document.getElementById('personalIdCard').value.trim();
+            const idCardFront = document.getElementById('idCardFrontUrl').value;
+            const idCardBack = document.getElementById('idCardBackUrl').value;
+            
+            // 验证
+            if (!realName) {
+                alert('请输入真实姓名');
+                return;
+            }
+            if (!/^\d{17}[\dXx]$/.test(idCard)) {
+                alert('请输入正确的18位身份证号码');
+                return;
+            }
+            if (!idCardFront) {
+                alert('请上传身份证正面照片');
+                return;
+            }
+            if (!idCardBack) {
+                alert('请上传身份证反面照片');
+                return;
+            }
+            
+            try {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.textContent = '提交中...';
+                
+                const result = await VerificationAPI.submitPersonal({
+                    realName,
+                    idCard,
+                    idCardFront,
+                    idCardBack
+                });
+                
+                if (result.success) {
+                    alert('个人身份认证申请提交成功，请等待审核');
+                    hidePersonalAuthForm();
+                    loadVerificationStatus();
+                } else {
+                    alert(result.message || '提交失败');
+                }
+            } catch (error) {
+                console.error('提交个人认证失败:', error);
+                alert('提交失败: ' + (error.message || '未知错误'));
+            } finally {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '提交认证';
+            }
+        });
+        
+        // 处理企业认证表单提交
+        document.getElementById('enterpriseVerifyForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const enterpriseName = document.getElementById('enterpriseName').value.trim();
+            const creditCode = document.getElementById('creditCode').value.trim();
+            const legalPersonName = document.getElementById('legalPersonName').value.trim();
+            const legalPersonIdCard = document.getElementById('legalPersonIdCard').value.trim();
+            const businessLicense = document.getElementById('businessLicenseUrl').value;
+            const authorizationLetter = document.getElementById('authorizationLetterUrl').value;
+            
+            // 验证
+            if (!enterpriseName) {
+                alert('请输入企业名称');
+                return;
+            }
+            if (!creditCode) {
+                alert('请输入统一社会信用代码');
+                return;
+            }
+            if (!legalPersonName) {
+                alert('请输入法人姓名');
+                return;
+            }
+            if (!/^\d{17}[\dXx]$/.test(legalPersonIdCard)) {
+                alert('请输入正确的法人身份证号');
+                return;
+            }
+            if (!businessLicense) {
+                alert('请上传企业营业执照');
+                return;
+            }
+            if (!authorizationLetter) {
+                alert('请上传加盖公章的授权函');
+                return;
+            }
+            
+            try {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.textContent = '提交中...';
+                
+                const result = await VerificationAPI.submitEnterprise({
+                    enterpriseName,
+                    creditCode,
+                    legalPersonName,
+                    legalPersonIdCard,
+                    businessLicense,
+                    authorizationLetter
+                });
+                
+                if (result.success) {
+                    alert('企业认证申请提交成功，请等待审核');
+                    hideEnterpriseAuthForm();
+                    loadVerificationStatus();
+                } else {
+                    alert(result.message || '提交失败');
+                }
+            } catch (error) {
+                console.error('提交企业认证失败:', error);
+                alert('提交失败: ' + (error.message || '未知错误'));
+            } finally {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '提交认证';
+            }
+        });
+        
+        // 查看认证详情
+        async function showVerificationDetail(id) {
+            try {
+                const result = await VerificationAPI.getApplicationDetail(id);
+                if (result.success) {
+                    const app = result.data;
+                    const statusMap = {
+                        'pending': '审核中',
+                        'approved': '已通过',
+                        'rejected': '未通过'
+                    };
+                    alert(`认证申请详情\n\n类型: ${app.type === 'personal' ? '个人认证' : '企业认证'}\n状态: ${statusMap[app.status]}\n提交时间: ${new Date(app.created_at).toLocaleString()}\n${app.review_comment ? '审核意见: ' + app.review_comment : ''}`);
+                }
+            } catch (error) {
+                console.error('获取认证详情失败:', error);
+            }
+        }
+
+        // Load registration data from API
+        async function loadRegistrationData() {
+            console.log('[User] 开始加载登记数据...');
+            try {
+                const result = await RegistrationAPI.getMyList();
+                console.log('[User] 登记数据API返回:', result);
+                
+                if (!result.success) {
+                    throw new Error(result.message || '获取登记列表失败');
+                }
+                
+                if (!result.data || !result.data.list) {
+                    throw new Error('返回数据格式异常');
+                }
+                
+                const userRegistrations = result.data.list;
+                console.log(`[User] 获取到 ${userRegistrations.length} 条登记记录`);
+                
+                const container = document.getElementById('registrationTable');
+                if (!container) {
+                    console.warn('[User] 登记表格容器不存在');
+                    return;
+                }
+                
+                if (userRegistrations.length === 0) {
+                    container.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-gray-400">暂无登记记录</td></tr>';
+                    return;
+                }
+                
+                const categoryMap = {
+                    'financial': '金融数据',
+                    'medical': '医疗数据',
+                    'traffic': '交通数据',
+                    'education': '教育数据',
+                    'industrial': '工业数据',
+                    'other': '其他数据'
+                };
+                
+                container.innerHTML = userRegistrations.map(reg => `
+                    <tr class="border-b border-gray-700 hover:bg-white hover:bg-opacity-5">
+                        <td class="py-3 px-4">
+                            <div class="font-medium">${reg.title}</div>
+                            <div class="text-sm text-gray-300">${reg.registration_no}</div>
+                        </td>
+                        <td class="py-3 px-4">${categoryMap[reg.category] || reg.category}</td>
+                        <td class="py-3 px-4">${new Date(reg.created_at).toLocaleDateString('zh-CN')}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 rounded-full text-xs ${getStatusClass(reg.status)}">
+                                ${getStatusText(reg.status)}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <button onclick="viewRegistration(${reg.id})" class="text-blue-400 hover:text-blue-300 text-sm">
+                                查看详情
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('[User] 加载登记数据失败:', error);
+                const errorMsg = error.message || '加载失败，请稍后重试';
+                const container = document.getElementById('registrationTable');
+                if (container) {
+                    container.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-red-400">${errorMsg}</td></tr>`;
+                }
+            }
+        }
+
+        // Get status display class
+        function getStatusClass(status) {
+            const classMap = {
+                'pending': 'bg-yellow-600 bg-opacity-20 text-yellow-400',
+                'reviewing': 'bg-blue-600 bg-opacity-20 text-blue-400',
+                'approved': 'bg-green-600 bg-opacity-20 text-green-400',
+                'rejected': 'bg-red-600 bg-opacity-20 text-red-400',
+                'revoked': 'bg-gray-600 bg-opacity-20 text-gray-400'
+            };
+            return classMap[status] || 'bg-gray-600 bg-opacity-20 text-gray-400';
+        }
+
+        // Get status display text
+        function getStatusText(status) {
+            const textMap = {
+                'pending': '待审核',
+                'reviewing': '审核中',
+                'approved': '已通过',
+                'rejected': '已拒绝',
+                'revoked': '已撤销'
+            };
+            return textMap[status] || '未知状态';
+        }
+
+        // Initialize forms
+        function initializeForms() {
+            // Profile form
+            const profileForm = document.getElementById('profileForm');
+            if (profileForm) {
+                profileForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    try {
+                        const profile = {
+                            username: document.getElementById('profileName').value,
+                            email: document.getElementById('profileEmail').value,
+                            realName: document.getElementById('profileName').value,
+                            organization: document.getElementById('profileOrg').value
+                        };
+                        
+                        const result = await AuthAPI.updateProfile(profile);
+                        if (result.success) {
+                            alert('个人信息已更新！');
+                            await loadUserData();
+                        } else {
+                            alert(result.message || '更新失败');
+                        }
+                    } catch (error) {
+                        console.error('更新个人信息失败:', error);
+                        alert('更新失败，请稍后重试');
+                    }
+                });
+            }
+            
+            // Password form
+            const passwordForm = document.getElementById('passwordForm');
+            if (passwordForm) {
+                passwordForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    try {
+                        const inputs = this.querySelectorAll('input');
+                        const oldPassword = inputs[0].value;
+                        const newPassword = inputs[1].value;
+                        const confirmPassword = inputs[2].value;
+                        
+                        if (newPassword !== confirmPassword) {
+                            alert('两次输入的新密码不一致');
+                            return;
+                        }
+                        
+                        const result = await AuthAPI.changePassword(oldPassword, newPassword);
+                        if (result.success) {
+                            alert('密码修改成功！');
+                            this.reset();
+                        } else {
+                            alert(result.message || '修改失败');
+                        }
+                    } catch (error) {
+                        console.error('修改密码失败:', error);
+                        alert('修改失败，请检查原密码是否正确');
+                    }
+                });
+            }
+        }
+
+        // View registration details
+        async function viewRegistration(id) {
+            console.log('[User] 查看登记详情, ID:', id);
+            try {
+                const result = await RegistrationAPI.getDetail(id);
+                console.log('[User] 登记详情API返回:', result);
+                
+                if (result.success && result.data) {
+                    const reg = result.data;
+                    alert(`登记详情:\n编号: ${reg.registration_no}\n名称: ${reg.title}\n分类: ${reg.categoryText || reg.category}\n状态: ${reg.statusText || getStatusText(reg.status)}\n创建时间: ${new Date(reg.created_at).toLocaleDateString('zh-CN')}`);
+                } else {
+                    alert('获取详情失败: ' + (result.message || '未知错误'));
+                }
+            } catch (error) {
+                console.error('[User] 获取登记详情失败:', error);
+                alert('获取详情失败: ' + (error.message || '请稍后重试'));
+            }
+        }
+
+        // Show settings
+        function showSettings() {
+            switchTab('profile');
+        }
+
+        // Start enterprise authentication (deprecated, use showEnterpriseAuthForm instead)
+        function startEnterpriseAuth() {
+            showEnterpriseAuthForm();
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                AuthAPI.logout();
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Registration modal functions
+        function showRegistrationModal() {
+            document.getElementById('registrationModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideRegistrationModal() {
+            document.getElementById('registrationModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
+</html>

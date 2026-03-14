@@ -1,0 +1,67 @@
+{
+  "version": "2.0",
+  "envId": "your-env-id-here",
+  "$schema": "https://framework-1258016615.tcloudbaseapp.com/schema/latest.json",
+  "framework": {
+    "name": "datadj",
+    "plugins": {
+      "client": {
+        "use": "@cloudbase/framework-plugin-website",
+        "inputs": {
+          "buildOutput": "./",
+          "ignore": [
+            "backend/**",
+            "deploy/**",
+            "node_modules/**",
+            ".git/**",
+            "*.md",
+            "test-*.html",
+            "test-*.sh",
+            ".DS_Store",
+            "AGENTS.md",
+            "SYNC_UPDATE.md",
+            "UPDATE_LOG.md",
+            "ADMIN_UPDATE.md",
+            "USER_SYSTEM_GUIDE.md",
+            "PROTECTION_TEST_REPORT.md",
+            "PROTECTION_TEST_SUMMARY.md",
+            "USER_REGISTRATION_GUIDE.md",
+            "REGISTRATION_IMPLEMENTATION_SUMMARY.md",
+            "TENCENT_CLOUD_DEPLOYMENT_GUIDE.md",
+            "CLOUDBASE_DEPLOYMENT_GUIDE.md"
+          ]
+        }
+      },
+      "server": {
+        "use": "@cloudbase/framework-plugin-container",
+        "inputs": {
+          "serviceName": "datadj-api",
+          "servicePath": "/api",
+          "localPath": "./backend",
+          "dockerfilePath": "./Dockerfile",
+          "containerPort": 3002,
+          "envVariables": {
+            "NODE_ENV": "production",
+            "PORT": "3002",
+            "JWT_SECRET": "your-jwt-secret-change-this",
+            "JWT_EXPIRES_IN": "7d",
+            "DB_PATH": "/app/data/tj_data_property.db",
+            "UPLOAD_DIR": "/app/uploads",
+            "MAX_FILE_SIZE": "52428800",
+            "LOG_LEVEL": "info"
+          },
+          "volumeMounts": [
+            {
+              "mountPath": "/app/data",
+              "volume": "data-volume"
+            },
+            {
+              "mountPath": "/app/uploads",
+              "volume": "uploads-volume"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

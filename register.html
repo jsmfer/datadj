@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据产权登记 - 天津数据产权登记服务平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="js/components/simple-layout.js"></script>
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #3b82f6;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --error-red: #ef4444;
+            --neutral-gray: #6b7280;
+            --light-gray: #f3f4f6;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-2px);
+            color: #3b82f6;
+        }
+        
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .step-indicator {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .step-indicator.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .step-indicator.completed {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+            color: #10b981;
+        }
+        
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 0 1rem;
+            position: relative;
+        }
+        
+        .step-line.completed::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: #10b981;
+            animation: fillLine 0.5s ease-out;
+        }
+        
+        @keyframes fillLine {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        .data-type-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .data-type-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .data-type-card.selected {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .file-upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload-area:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .file-upload-area.dragover {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .ai-suggestion {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+        
+        .validation-error {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        .validation-success {
+            color: #10b981;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body class="text-white" data-current-page="register">
+    <div id="header-container"></div>
+
+    <main class="page-content">
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4">数据产权登记申请</h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    通过标准化、流程化的登记机制，为您的数据资产赋予清晰、可追溯的产权标识
+                </p>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="mb-12">
+                <div class="flex items-center justify-center">
+                    <div class="step-indicator active" id="step1">
+                        <span class="text-lg font-bold">1</span>
+                    </div>
+                    <div class="step-line" id="line1"></div>
+                    <div class="step-indicator" id="step2">
+                        <span class="text-lg font-bold">2</span>
+                    </div>
+                    <div class="step-line" id="line2"></div>
+                    <div class="step-indicator" id="step3">
+                        <span class="text-lg font-bold">3</span>
+                    </div>
+                    <div class="step-line" id="line3"></div>
+                    <div class="step-indicator" id="step4">
+                        <span class="text-lg font-bold">4</span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center mt-4">
+                    <div class="text-center w-20 text-sm text-blue-400">选择类型</div>
+                    <div class="flex-1 mx-4"></div>
+                    <div class="text-center w-20 text-sm text-gray-400">填写信息</div>
+                    <div class="flex-1 mx-4"></div>
+                    <div class="text-center w-20 text-sm text-gray-400">上传材料</div>
+                    <div class="flex-1 mx-4"></div>
+                    <div class="text-center w-20 text-sm text-gray-400">提交审核</div>
+                </div>
+            </div>
+
+            <!-- Registration Form -->
+            <div class="glass-card p-8 rounded-2xl">
+                <!-- Step 1: Data Type Selection -->
+                <div id="step1-content" class="step-content">
+                    <h2 class="text-2xl font-bold mb-6 text-center">选择数据类型</h2>
+                    <p class="text-gray-300 text-center mb-8">请选择您要登记的数据类型，我们将根据您的选择提供相应的登记流程</p>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="data-type-card glass-card p-6 rounded-xl border border-gray-600" data-type="financial">
+                            <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-center">金融数据</h3>
+                            <p class="text-gray-300 text-center text-sm">银行、证券、保险等金融机构产生的数据</p>
+                        </div>
+
+                        <div class="data-type-card glass-card p-6 rounded-xl border border-gray-600" data-type="medical">
+                            <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-center">医疗数据</h3>
+                            <p class="text-gray-300 text-center text-sm">医疗机构、健康管理平台产生的健康数据</p>
+                        </div>
+
+                        <div class="data-type-card glass-card p-6 rounded-xl border border-gray-600" data-type="traffic">
+                            <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-center">交通数据</h3>
+                            <p class="text-gray-300 text-center text-sm">交通运输、物流、出行服务产生的数据</p>
+                        </div>
+
+                        <div class="data-type-card glass-card p-6 rounded-xl border border-gray-600" data-type="education">
+                            <div class="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-center">教育数据</h3>
+                            <p class="text-gray-300 text-center text-sm">教育机构、在线学习平台产生的教学数据</p>
+                        </div>
+
+                        <div class="data-type-card glass-card p-6 rounded-xl border border-gray-600" data-type="industrial">
+                            <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-center">工业数据</h3>
+                            <p class="text-gray-300 text-center text-sm">制造业、工业物联网产生的生产数据</p>
+                        </div>
+
+                        <div class="data-type-card glass-card p-6 rounded-xl border border-gray-600" data-type="other">
+                            <div class="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-center">其他数据</h3>
+                            <p class="text-gray-300 text-center text-sm">其他类型的数据资产</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center mt-8">
+                        <button onclick="nextStep()" id="step1-next" class="btn-primary px-8 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            下一步
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Basic Information -->
+                <div id="step2-content" class="step-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">填写基本信息</h2>
+                    
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">数据资产名称 *</label>
+                                <input type="text" id="dataName" class="form-input w-full px-4 py-3 rounded-lg" placeholder="请输入数据资产名称">
+                                <div class="validation-error" id="dataName-error"></div>
+                                <div class="ai-suggestion">
+                                    <div class="text-sm text-purple-300 mb-1">💡 AI建议</div>
+                                    <div class="text-sm text-gray-300">建议使用"地区+行业+数据类型"的命名格式，如"天津市交通流量数据集"</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">数据类型 *</label>
+                                <select id="dataType" class="form-input w-full px-4 py-3 rounded-lg">
+                                    <option value="">请选择数据类型</option>
+                                    <option value="structured">结构化数据</option>
+                                    <option value="unstructured">非结构化数据</option>
+                                    <option value="semi-structured">半结构化数据</option>
+                                    <option value="real-time">实时数据流</option>
+                                </select>
+                                <div class="validation-error" id="dataType-error"></div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">数据规模 *</label>
+                                <select id="dataSize" class="form-input w-full px-4 py-3 rounded-lg">
+                                    <option value="">请选择数据规模</option>
+                                    <option value="small">小型 (< 1GB)</option>
+                                    <option value="medium">中型 (1GB - 100GB)</option>
+                                    <option value="large">大型 (100GB - 1TB)</option>
+                                    <option value="extra-large">超大型 (> 1TB)</option>
+                                </select>
+                                <div class="validation-error" id="dataSize-error"></div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">数据来源 *</label>
+                                <input type="text" id="dataSource" class="form-input w-full px-4 py-3 rounded-lg" placeholder="请输入数据来源">
+                                <div class="validation-error" id="dataSource-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">应用场景 *</label>
+                                <textarea id="applicationScene" class="form-input w-full px-4 py-3 rounded-lg h-32" placeholder="请描述数据的主要应用场景和价值"></textarea>
+                                <div class="validation-error" id="applicationScene-error"></div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">更新频率</label>
+                                <select id="updateFrequency" class="form-input w-full px-4 py-3 rounded-lg">
+                                    <option value="">请选择更新频率</option>
+                                    <option value="real-time">实时更新</option>
+                                    <option value="daily">每日更新</option>
+                                    <option value="weekly">每周更新</option>
+                                    <option value="monthly">每月更新</option>
+                                    <option value="quarterly">每季度更新</option>
+                                    <option value="yearly">每年更新</option>
+                                    <option value="static">静态数据</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">数据格式</label>
+                                <input type="text" id="dataFormat" class="form-input w-full px-4 py-3 rounded-lg" placeholder="如：JSON, CSV, XML, 等">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">预期价值</label>
+                                <textarea id="expectedValue" class="form-input w-full px-4 py-3 rounded-lg h-24" placeholder="请描述数据的预期经济价值和社会价值"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mt-8">
+                        <button onclick="prevStep()" class="bg-gray-600 hover:bg-gray-700 px-8 py-3 rounded-lg font-medium transition-colors">
+                            上一步
+                        </button>
+                        <button onclick="nextStep()" class="btn-primary px-8 py-3 rounded-lg font-medium">
+                            下一步
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Upload Materials -->
+                <div id="step3-content" class="step-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">上传证明材料</h2>
+                    
+                    <div class="space-y-8">
+                        <!-- Data Sample Upload -->
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">数据样本 *</h3>
+                            <div class="file-upload-area p-8 rounded-lg text-center" id="sampleUploadArea">
+                                <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                                <p class="text-lg font-medium mb-2">点击上传或拖拽文件到此处</p>
+                                <p class="text-sm text-gray-300 mb-4">支持格式：CSV, JSON, XML, TXT, XLSX (最大10MB)</p>
+                                <input type="file" id="sampleFile" class="hidden" accept=".csv,.json,.xml,.txt,.xlsx">
+                                <button onclick="document.getElementById('sampleFile').click()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg transition-colors">
+                                    选择文件
+                                </button>
+                            </div>
+                            <div id="sampleFileInfo" class="mt-4 hidden">
+                                <div class="flex items-center justify-between p-4 bg-green-600 bg-opacity-20 rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium" id="sampleFileName"></div>
+                                            <div class="text-sm text-gray-300" id="sampleFileSize"></div>
+                                        </div>
+                                    </div>
+                                    <button onclick="removeFile('sample')" class="text-red-400 hover:text-red-300">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ownership Proof Upload -->
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">权属证明文件 *</h3>
+                            <div class="file-upload-area p-8 rounded-lg text-center" id="ownershipUploadArea">
+                                <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <p class="text-lg font-medium mb-2">点击上传权属证明文件</p>
+                                <p class="text-sm text-gray-300 mb-4">支持格式：PDF, DOC, DOCX, JPG, PNG (最大5MB)</p>
+                                <input type="file" id="ownershipFile" class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                <button onclick="document.getElementById('ownershipFile').click()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg transition-colors">
+                                    选择文件
+                                </button>
+                            </div>
+                            <div id="ownershipFileInfo" class="mt-4 hidden">
+                                <div class="flex items-center justify-between p-4 bg-green-600 bg-opacity-20 rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium" id="ownershipFileName"></div>
+                                            <div class="text-sm text-gray-300" id="ownershipFileSize"></div>
+                                        </div>
+                                    </div>
+                                    <button onclick="removeFile('ownership')" class="text-red-400 hover:text-red-300">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Documents -->
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">其他补充材料</h3>
+                            <div class="file-upload-area p-8 rounded-lg text-center" id="additionalUploadArea">
+                                <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                                <p class="text-lg font-medium mb-2">上传其他补充材料（可选）</p>
+                                <p class="text-sm text-gray-300 mb-4">支持格式：PDF, DOC, DOCX, JPG, PNG (每个文件最大5MB)</p>
+                                <input type="file" id="additionalFiles" class="hidden" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                <button onclick="document.getElementById('additionalFiles').click()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg transition-colors">
+                                    选择文件
+                                </button>
+                            </div>
+                            <div id="additionalFilesList" class="mt-4 space-y-2 hidden">
+                                <!-- Additional files will be listed here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mt-8">
+                        <button onclick="prevStep()" class="bg-gray-600 hover:bg-gray-700 px-8 py-3 rounded-lg font-medium transition-colors">
+                            上一步
+                        </button>
+                        <button onclick="nextStep()" class="btn-primary px-8 py-3 rounded-lg font-medium">
+                            下一步
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Review and Submit -->
+                <div id="step4-content" class="step-content hidden">
+                    <h2 class="text-2xl font-bold mb-6">确认提交申请</h2>
+                    
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <!-- Information Review -->
+                        <div class="space-y-6">
+                            <div class="glass-card p-6 rounded-xl">
+                                <h3 class="text-lg font-bold mb-4">基本信息确认</h3>
+                                <div class="space-y-3" id="infoReview">
+                                    <!-- Information will be populated here -->
+                                </div>
+                            </div>
+
+                            <div class="glass-card p-6 rounded-xl">
+                                <h3 class="text-lg font-bold mb-4">上传文件确认</h3>
+                                <div class="space-y-3" id="fileReview">
+                                    <!-- File information will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submission Process -->
+                        <div class="space-y-6">
+                            <div class="glass-card p-6 rounded-xl">
+                                <h3 class="text-lg font-bold mb-4">审核流程</h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                                        <div>
+                                            <div class="font-medium">智能初审</div>
+                                            <div class="text-sm text-gray-300">AI自动审核材料完整性</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                                        <div>
+                                            <div class="font-medium">专家审核</div>
+                                            <div class="text-sm text-gray-300">行业专家评估数据价值</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                                        <div>
+                                            <div class="font-medium">公示发布</div>
+                                            <div class="text-sm text-gray-300">面向社会公众征求意见</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="glass-card p-6 rounded-xl">
+                                <h3 class="text-lg font-bold mb-4">服务承诺</h3>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li>• 3个工作日内完成智能初审</li>
+                                    <li>• 7个工作日内完成专家审核</li>
+                                    <li>• 15个工作日内完成公示发布</li>
+                                    <li>• 全程进度实时可查</li>
+                                    <li>• 审核未通过全额退款</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-yellow-600 bg-opacity-20 border border-yellow-600 border-opacity-30 rounded-lg p-4">
+                                <div class="flex items-start space-x-3">
+                                    <svg class="w-6 h-6 text-yellow-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                    </svg>
+                                    <div>
+                                        <div class="font-medium text-yellow-400">重要提醒</div>
+                                        <div class="text-sm text-gray-300 mt-1">请确保所有信息真实有效，虚假信息将承担相应法律责任。</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center mt-8">
+                        <button onclick="prevStep()" class="bg-gray-600 hover:bg-gray-700 px-8 py-3 rounded-lg font-medium transition-colors mr-4">
+                            上一步
+                        </button>
+                        <button onclick="submitApplication()" class="btn-primary px-12 py-3 rounded-lg font-medium">
+                            提交申请
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="glass-card p-8 rounded-2xl max-w-md w-full mx-4 text-center">
+            <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-4">申请提交成功！</h3>
+            <p class="text-gray-300 mb-6">您的数据产权登记申请已成功提交，申请编号为：<span id="applicationNumber" class="text-blue-400 font-mono"></span></p>
+            <p class="text-sm text-gray-400 mb-8">我们将在3个工作日内完成智能初审，请耐心等待审核结果。</p>
+            <div class="flex space-x-4">
+                <button onclick="trackApplication()" class="btn-primary flex-1 py-3 rounded-lg font-medium">
+                    查看进度
+                </button>
+                <button onclick="closeSuccessModal()" class="bg-gray-600 hover:bg-gray-700 flex-1 py-3 rounded-lg font-medium transition-colors">
+                    关闭
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth-check.js"></script>
+    <script src="main.js"></script>
+    <script>
+        // Registration page specific functionality
+        let currentStep = 1;
+        let selectedDataType = '';
+        let uploadedFiles = {
+            sample: null,
+            ownership: null,
+            additional: []
+        };
+
+        // Initialize registration page
+        let pageInitialized = false;
+        async function initializePage() {
+            if (pageInitialized) {
+                console.log('[Register] 页面已初始化，跳过');
+                return;
+            }
+            pageInitialized = true;
+            
+            console.log('[Register] 开始初始化页面...');
+            
+            // 初始化布局
+            if (typeof initLayoutSimple === 'function') {
+                try {
+                    await initLayoutSimple({ currentPage: 'register' });
+                } catch (e) {
+                    console.error('[Register] 布局初始化失败:', e);
+                }
+            } else {
+                console.warn('[Register] initLayoutSimple 函数不可用');
+            }
+            
+            initializeFileUpload();
+            initializeFormValidation();
+            initializeDataTypeSelection();
+            
+            console.log('[Register] 页面初始化完成');
+        }
+
+        // 立即开始初始化（脚本已在页面底部，DOM已就绪）
+        initializePage();
+
+        // Initialize data type selection
+        function initializeDataTypeSelection() {
+            document.querySelectorAll('.data-type-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selection from all cards
+                    document.querySelectorAll('.data-type-card').forEach(c => {
+                        c.classList.remove('selected');
+                    });
+                    
+                    // Add selection to clicked card
+                    this.classList.add('selected');
+                    selectedDataType = this.dataset.type;
+                    
+                    // Enable next button
+                    document.getElementById('step1-next').disabled = false;
+                    
+                    // Add visual feedback
+                    anime({
+                        targets: this,
+                        scale: [1, 1.05, 1],
+                        duration: 300,
+                        easing: 'easeOutQuart'
+                    });
+                });
+            });
+        }
+
+        // Initialize file upload functionality
+        function initializeFileUpload() {
+            // Sample file upload
+            const sampleFile = document.getElementById('sampleFile');
+            sampleFile.addEventListener('change', function(e) {
+                handleFileUpload(e.target.files[0], 'sample');
+            });
+
+            // Ownership file upload
+            const ownershipFile = document.getElementById('ownershipFile');
+            ownershipFile.addEventListener('change', function(e) {
+                handleFileUpload(e.target.files[0], 'ownership');
+            });
+
+            // Additional files upload
+            const additionalFiles = document.getElementById('additionalFiles');
+            additionalFiles.addEventListener('change', function(e) {
+                handleAdditionalFiles(e.target.files);
+            });
+
+            // Drag and drop functionality
+            setupDragAndDrop('sampleUploadArea', 'sampleFile');
+            setupDragAndDrop('ownershipUploadArea', 'ownershipFile');
+            setupDragAndDrop('additionalUploadArea', 'additionalFiles');
+        }
+
+        // Setup drag and drop
+        function setupDragAndDrop(areaId, inputId) {
+            const area = document.getElementById(areaId);
+            
+            area.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                area.classList.add('dragover');
+            });
+            
+            area.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                area.classList.remove('dragover');
+            });
+            
+            area.addEventListener('drop', function(e) {
+                e.preventDefault();
+                area.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    document.getElementById(inputId).files = files;
+                    document.getElementById(inputId).dispatchEvent(new Event('change'));
+                }
+            });
+        }
+
+        // Handle file upload
+        function handleFileUpload(file, type) {
+            if (!file) return;
+            
+            uploadedFiles[type] = file;
+            
+            const fileInfo = document.getElementById(type + 'FileInfo');
+            const fileName = document.getElementById(type + 'FileName');
+            const fileSize = document.getElementById(type + 'FileSize');
+            
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.remove('hidden');
+            
+            // Animate file info appearance
+            anime({
+                targets: fileInfo,
+                opacity: [0, 1],
+                translateY: [-20, 0],
+                duration: 300,
+                easing: 'easeOutQuart'
+            });
+        }
+
+        // Handle additional files
+        function handleAdditionalFiles(files) {
+            if (!files || files.length === 0) return;
+            
+            uploadedFiles.additional = Array.from(files);
+            
+            const filesList = document.getElementById('additionalFilesList');
+            filesList.innerHTML = '';
+            
+            Array.from(files).forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'flex items-center justify-between p-3 bg-green-600 bg-opacity-20 rounded-lg';
+                fileItem.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <div class="font-medium">${file.name}</div>
+                            <div class="text-sm text-gray-300">${formatFileSize(file.size)}</div>
+                        </div>
+                    </div>
+                    <button onclick="removeAdditionalFile(${index})" class="text-red-400 hover:text-red-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                `;
+                filesList.appendChild(fileItem);
+            });
+            
+            filesList.classList.remove('hidden');
+        }
+
+        // Remove file
+        function removeFile(type) {
+            uploadedFiles[type] = null;
+            document.getElementById(type + 'FileInfo').classList.add('hidden');
+            document.getElementById(type + 'File').value = '';
+        }
+
+        // Remove additional file
+        function removeAdditionalFile(index) {
+            uploadedFiles.additional.splice(index, 1);
+            
+            if (uploadedFiles.additional.length === 0) {
+                document.getElementById('additionalFilesList').classList.add('hidden');
+            } else {
+                // Re-render the list
+                const files = uploadedFiles.additional;
+                uploadedFiles.additional = [];
+                handleAdditionalFiles(files);
+            }
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Initialize form validation
+        function initializeFormValidation() {
+            const requiredFields = ['dataName', 'dataType', 'dataSize', 'dataSource', 'applicationScene'];
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('blur', function() {
+                        validateField(fieldId);
+                    });
+                    
+                    field.addEventListener('input', function() {
+                        clearValidationError(fieldId);
+                    });
+                }
+            });
+        }
+
+        // Validate field
+        function validateField(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(fieldId + '-error');
+            
+            if (!field.value.trim()) {
+                errorElement.textContent = '此字段为必填项';
+                return false;
+            }
+            
+            // Additional validation rules
+            switch(fieldId) {
+                case 'dataName':
+                    if (field.value.length < 5) {
+                        errorElement.textContent = '数据资产名称至少需要5个字符';
+                        return false;
+                    }
+                    break;
+                case 'applicationScene':
+                    if (field.value.length < 20) {
+                        errorElement.textContent = '应用场景描述至少需要20个字符';
+                        return false;
+                    }
+                    break;
+            }
+            
+            errorElement.textContent = '';
+            return true;
+        }
+
+        // Clear validation error
+        function clearValidationError(fieldId) {
+            const errorElement = document.getElementById(fieldId + '-error');
+            errorElement.textContent = '';
+        }
+
+        // Validate current step
+        function validateStep(step) {
+            switch(step) {
+                case 1:
+                    return selectedDataType !== '';
+                case 2:
+                    const requiredFields = ['dataName', 'dataType', 'dataSize', 'dataSource', 'applicationScene'];
+                    return requiredFields.every(fieldId => {
+                        const field = document.getElementById(fieldId);
+                        return field && field.value.trim() !== '';
+                    });
+                case 3:
+                    return uploadedFiles.sample && uploadedFiles.ownership;
+                case 4:
+                    return true; // Final step, no validation needed
+                default:
+                    return false;
+            }
+        }
+
+        // Next step
+        function nextStep() {
+            if (!validateStep(currentStep)) {
+                alert('请完成当前步骤的所有必填项');
+                return;
+            }
+            
+            if (currentStep < 4) {
+                // Hide current step
+                document.getElementById(`step${currentStep}-content`).classList.add('hidden');
+                
+                // Update step indicator
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}`).classList.add('completed');
+                document.getElementById(`line${currentStep}`).classList.add('completed');
+                
+                currentStep++;
+                
+                // Show next step
+                document.getElementById(`step${currentStep}-content`).classList.remove('hidden');
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                
+                // Update step text colors
+                updateStepTextColors();
+                
+                // Populate review information if on step 4
+                if (currentStep === 4) {
+                    populateReviewInfo();
+                }
+                
+                // Animate step transition
+                anime({
+                    targets: `#step${currentStep}-content`,
+                    opacity: [0, 1],
+                    translateX: [50, 0],
+                    duration: 300,
+                    easing: 'easeOutQuart'
+                });
+            }
+        }
+
+        // Previous step
+        function prevStep() {
+            if (currentStep > 1) {
+                // Hide current step
+                document.getElementById(`step${currentStep}-content`).classList.add('hidden');
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                
+                currentStep--;
+                
+                // Show previous step
+                document.getElementById(`step${currentStep}-content`).classList.remove('hidden');
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}`).classList.remove('completed');
+                document.getElementById(`line${currentStep}`).classList.remove('completed');
+                
+                // Update step text colors
+                updateStepTextColors();
+                
+                // Animate step transition
+                anime({
+                    targets: `#step${currentStep}-content`,
+                    opacity: [0, 1],
+                    translateX: [-50, 0],
+                    duration: 300,
+                    easing: 'easeOutQuart'
+                });
+            }
+        }
+
+        // Update step text colors
+        function updateStepTextColors() {
+            const stepTexts = document.querySelectorAll('.text-center.w-20');
+            stepTexts.forEach((text, index) => {
+                if (index + 1 <= currentStep) {
+                    text.classList.remove('text-gray-400');
+                    text.classList.add('text-blue-400');
+                } else {
+                    text.classList.remove('text-blue-400');
+                    text.classList.add('text-gray-400');
+                }
+            });
+        }
+
+        // Populate review information
+        function populateReviewInfo() {
+            const infoReview = document.getElementById('infoReview');
+            const fileReview = document.getElementById('fileReview');
+            
+            // Basic information
+            const basicInfo = [
+                { label: '数据资产名称', value: document.getElementById('dataName').value },
+                { label: '数据类型', value: document.getElementById('dataType').value },
+                { label: '数据规模', value: document.getElementById('dataSize').value },
+                { label: '数据来源', value: document.getElementById('dataSource').value },
+                { label: '更新频率', value: document.getElementById('updateFrequency').value || '未指定' },
+                { label: '数据格式', value: document.getElementById('dataFormat').value || '未指定' }
+            ];
+            
+            infoReview.innerHTML = basicInfo.map(item => `
+                <div class="flex justify-between">
+                    <span class="text-gray-300">${item.label}:</span>
+                    <span class="font-medium">${item.value}</span>
+                </div>
+            `).join('');
+            
+            // File information
+            const fileInfo = [];
+            if (uploadedFiles.sample) {
+                fileInfo.push({ label: '数据样本', value: uploadedFiles.sample.name });
+            }
+            if (uploadedFiles.ownership) {
+                fileInfo.push({ label: '权属证明', value: uploadedFiles.ownership.name });
+            }
+            if (uploadedFiles.additional.length > 0) {
+                uploadedFiles.additional.forEach((file, index) => {
+                    fileInfo.push({ label: `补充材料${index + 1}`, value: file.name });
+                });
+            }
+            
+            fileReview.innerHTML = fileInfo.map(item => `
+                <div class="flex justify-between">
+                    <span class="text-gray-300">${item.label}:</span>
+                    <span class="font-medium text-sm">${item.value}</span>
+                </div>
+            `).join('');
+        }
+
+        // 用户认证状态
+        let userVerificationStatus = {
+            verified: false,
+            realName: null,
+            organization: null
+        };
+
+        // 检查用户认证状态
+        async function checkUserVerification() {
+            try {
+                // 使用 ApiService 获取 token（兼容 localStorage 和 sessionStorage）
+                const token = ApiService.getToken();
+                console.log('检查认证状态 - Token:', token ? '存在' : '不存在');
+                
+                if (!token) {
+                    console.error('没有找到登录凭证');
+                    alert('您已登出，请重新登录');
+                    window.location.href = 'login.html';
+                    return null;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/verification/status`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const result = await response.json();
+                console.log('认证状态API返回:', result);
+                
+                if (result.success) {
+                    userVerificationStatus = {
+                        verified: result.data.verified,
+                        realName: result.data.realName,
+                        organization: result.data.organization
+                    };
+                    console.log('认证状态:', {
+                        verified: result.data.verified,
+                        realName: result.data.realName,
+                        organization: result.data.organization
+                    });
+                    return result.data;
+                } else {
+                    console.warn('获取认证状态失败:', result.message);
+                }
+            } catch (error) {
+                console.error('获取认证状态失败:', error);
+            }
+            return null;
+        }
+
+        // Submit application via API
+        async function submitApplication() {
+            try {
+                // 检查登录状态
+                console.log('检查登录状态...');
+                if (!ApiService.isLoggedIn()) {
+                    console.warn('用户未登录');
+                    alert('请先登录');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                console.log('用户已登录');
+
+                // 检查用户认证状态
+                console.log('检查认证状态...');
+                const verificationStatus = await checkUserVerification();
+                console.log('认证状态详细信息:', {
+                    verificationStatus: verificationStatus,
+                    verified: verificationStatus?.verified,
+                    verifiedType: typeof verificationStatus?.verified,
+                    realName: verificationStatus?.realName,
+                    organization: verificationStatus?.organization
+                });
+                
+                if (!verificationStatus) {
+                    alert('无法获取认证信息，请稍后重试');
+                    return;
+                }
+                
+                if (!verificationStatus.verified) {
+                    console.warn('认证状态未通过:', verificationStatus);
+                    alert('您尚未完成实名认证，请先完成认证后再提交登记申请');
+                    window.location.href = 'user.html#verification';
+                    return;
+                }
+                
+                if (!verificationStatus.realName || !verificationStatus.organization) {
+                    console.warn('认证信息不完整:', verificationStatus);
+                    alert('您的认证信息不完整（缺少姓名或机构），请完善个人信息后再提交');
+                    window.location.href = 'user.html#verification';
+                    return;
+                }
+                console.log('用户已完成认证');
+                
+                // 验证必填字段
+                if (!selectedDataType) {
+                    alert('请选择数据资产类型');
+                    return;
+                }
+                
+                const dataName = document.getElementById('dataName').value.trim();
+                if (!dataName) {
+                    alert('请填写数据资产名称');
+                    document.getElementById('dataName').focus();
+                    return;
+                }
+                
+                // 验证必填字段
+                const dataType = document.getElementById('dataType').value;
+                const dataSource = document.getElementById('dataSource').value.trim();
+                const applicationScene = document.getElementById('applicationScene').value.trim();
+                
+                if (!dataType) {
+                    alert('请选择数据类型');
+                    document.getElementById('dataType').focus();
+                    return;
+                }
+                if (!dataSource) {
+                    alert('请填写数据来源');
+                    document.getElementById('dataSource').focus();
+                    return;
+                }
+                if (!applicationScene) {
+                    alert('请填写应用场景');
+                    document.getElementById('applicationScene').focus();
+                    return;
+                }
+                
+                // 显示上传进度提示
+                const submitBtn = document.querySelector('button[onclick="submitApplication()"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = '提交中...';
+                submitBtn.disabled = true;
+                
+                // Gather form data
+                const registrationData = {
+                    title: dataName,
+                    category: selectedDataType,
+                    dataType: dataType,
+                    dataSize: document.getElementById('dataSize').value,
+                    dataSource: dataSource,
+                    applicationScene: applicationScene,
+                    updateFrequency: document.getElementById('updateFrequency').value,
+                    dataFormat: document.getElementById('dataFormat').value,
+                    expectedValue: document.getElementById('expectedValue').value,
+                    description: applicationScene
+                };
+                
+                console.log('提交登记数据:', JSON.stringify(registrationData, null, 2));
+                
+                // Step 1: 提交登记信息获取 registrationId
+                console.log('调用 RegistrationAPI.create...');
+                const result = await RegistrationAPI.create(registrationData);
+                console.log('RegistrationAPI.create 返回:', result);
+                
+                if (!result || !result.success) {
+                    throw new Error(result?.message || '提交登记信息失败');
+                }
+                
+                const registrationId = result.data?.id;
+                const token = ApiService.getToken();
+                
+                if (!registrationId) {
+                    throw new Error('服务器返回数据异常，缺少登记ID');
+                }
+                
+                console.log('登记创建成功，ID:', registrationId);
+                
+                // Step 2: 上传所有文件（使用新的批量上传接口）
+                if (uploadedFiles.sample || uploadedFiles.ownership || 
+                    (uploadedFiles.additional && uploadedFiles.additional.length > 0)) {
+                    
+                    submitBtn.textContent = '上传附件...';
+                    const formData = new FormData();
+                    
+                    // 添加数据样本
+                    if (uploadedFiles.sample) {
+                        formData.append('sample', uploadedFiles.sample);
+                    }
+                    
+                    // 添加权属证明
+                    if (uploadedFiles.ownership) {
+                        formData.append('ownership', uploadedFiles.ownership);
+                    }
+                    
+                    // 添加补充材料
+                    if (uploadedFiles.additional && uploadedFiles.additional.length > 0) {
+                        uploadedFiles.additional.forEach(file => {
+                            formData.append('additional', file);
+                        });
+                    }
+                    
+                    try {
+                        const uploadResponse = await fetch(`http://localhost:3002/api/upload/${registrationId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: formData
+                        });
+                        
+                        const uploadResult = await uploadResponse.json();
+                        
+                        if (!uploadResponse.ok) {
+                            console.warn('文件上传失败:', uploadResult.message);
+                        } else {
+                            console.log('文件上传成功:', uploadResult.data);
+                        }
+                    } catch (uploadError) {
+                        console.warn('文件上传异常:', uploadError);
+                        // 文件上传失败不影响登记提交，只记录警告
+                    }
+                }
+                
+                // Restore button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                
+                // Show success modal
+                document.getElementById('applicationNumber').textContent = result.data.registrationNo;
+                document.getElementById('successModal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                
+                // Animate success modal
+                anime({
+                    targets: '#successModal .glass-card',
+                    scale: [0.8, 1],
+                    opacity: [0, 1],
+                    duration: 300,
+                    easing: 'easeOutQuart'
+                });
+                
+            } catch (error) {
+                console.error('提交申请失败:', error);
+                alert('提交失败: ' + (error.message || '未知错误'));
+                
+                // Restore button state
+                const submitBtn = document.querySelector('button[onclick="submitApplication()"]');
+                if (submitBtn) {
+                    submitBtn.textContent = '提交申请';
+                    submitBtn.disabled = false;
+                }
+            }
+        }
+
+        // Get data type text
+        function getDataTypeText(type) {
+            const typeMap = {
+                'financial': '金融数据',
+                'medical': '医疗数据',
+                'traffic': '交通数据',
+                'education': '教育数据',
+                'industrial': '工业数据',
+                'other': '其他数据'
+            };
+            return typeMap[type] || '未知类型';
+        }
+
+        // Track application
+        function trackApplication() {
+            window.location.href = 'user.html';
+        }
+
+        // Close success modal
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            
+            // Reset form
+            resetForm();
+        }
+
+        // Reset form
+        function resetForm() {
+            currentStep = 1;
+            selectedDataType = '';
+            uploadedFiles = {
+                sample: null,
+                ownership: null,
+                additional: []
+            };
+            
+            // Reset UI
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById('step1-content').classList.remove('hidden');
+            
+            document.querySelectorAll('.step-indicator').forEach(indicator => {
+                indicator.classList.remove('active', 'completed');
+            });
+            document.getElementById('step1').classList.add('active');
+            
+            document.querySelectorAll('.step-line').forEach(line => {
+                line.classList.remove('completed');
+            });
+            
+            // Clear form fields
+            document.querySelectorAll('.form-input').forEach(input => {
+                input.value = '';
+            });
+            
+            // Clear file uploads
+            document.querySelectorAll('[id$="FileInfo"]').forEach(info => {
+                info.classList.add('hidden');
+            });
+            document.getElementById('additionalFilesList').classList.add('hidden');
+            
+            // Reset data type selection
+            document.querySelectorAll('.data-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Disable next button
+            document.getElementById('step1-next').disabled = true;
+        }
+    </script>
+</body>
+</html>

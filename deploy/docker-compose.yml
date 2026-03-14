@@ -1,0 +1,85 @@
+version: '3.8'
+
+# =============================================================================
+# Docker Compose 配置 - 适用于腾讯云的Docker部署
+# 使用方法:
+#   1. 安装Docker和Docker Compose
+#   2. 在此文件目录执行: docker-compose up -d
+# =============================================================================
+
+services:
+  # Node.js 后端服务
+  app:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: tj-data-property-app
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-this}
+      - JWT_EXPIRES_IN=7d
+      - DB_PATH=/app/data/tj_data_property.db
+      - UPLOAD_DIR=/app/uploads
+      - MAX_FILE_SIZE=52428800
+      - LOG_LEVEL=info
+    volumes:
+      - app-data:/app/data
+      - app-uploads:/app/uploads
+      - app-logs:/app/logs
+    networks:
+      - datadj-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Nginx 反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: tj-data-property-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../:/usr/share/nginx/html:ro
+      - ../backend/admin:/usr/share/nginx/html/admin:ro
+      - app-uploads:/usr/share/nginx/html/uploads:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - datadj-network
+
+  # 可选: 使用Watchtower自动更新镜像
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 3600 --cleanup
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=3600
+    profiles:
+      - auto-update
+
+volumes:
+  app-data:
+    driver: local
+  app-uploads:
+    driver: local
+  app-logs:
+    driver: local
+
+networks:
+  datadj-network:
+    driver: bridge

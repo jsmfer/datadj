@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 天津数据产权登记服务平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Noto Sans SC', sans-serif; }
+        .sidebar-item { transition: all 0.3s ease; }
+        .sidebar-item:hover, .sidebar-item.active { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .card { transition: all 0.3s ease; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="app" class="min-h-screen flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg">
+            <div class="p-6 border-b">
+                <h1 class="text-xl font-bold text-gray-800">管理后台</h1>
+                <p class="text-sm text-gray-500">天津数据产权登记平台</p>
+            </div>
+            <nav class="p-4 space-y-1">
+                <a href="#dashboard" class="sidebar-item active flex items-center px-4 py-3 rounded-lg text-gray-700" data-page="dashboard">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    仪表盘
+                </a>
+                <a href="#registrations" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700" data-page="registrations">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    产权登记
+                </a>
+                <a href="#users" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700" data-page="users">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    用户管理
+                </a>
+                <a href="#verification" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700" data-page="verification">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    认证审核
+                </a>
+                <a href="#protection" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700" data-page="protection">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    维权案件
+                </a>
+                <a href="#consultations" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700" data-page="consultations">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    法律咨询
+                </a>
+                <a href="#cases" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700" data-page="cases">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    成功案例
+                </a>
+                <a href="#news" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700" data-page="news">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                    新闻公告
+                </a>
+                <a href="#settings" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700" data-page="settings">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    系统设置
+                </a>
+                <a href="#site-config" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-gray-700" data-page="site-config">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+                    网站配置
+                </a>
+            </nav>
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t">
+                <button onclick="logout()" class="flex items-center w-full px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    退出登录
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-auto">
+            <!-- Header -->
+            <header class="bg-white shadow-sm sticky top-0 z-10">
+                <div class="flex justify-between items-center px-8 py-4">
+                    <h2 id="pageTitle" class="text-2xl font-bold text-gray-800">仪表盘</h2>
+                    <div class="flex items-center space-x-4">
+                        <span id="adminName" class="text-gray-600">管理员</span>
+                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                            A
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div id="pageContent" class="p-8">
+                <!-- Dashboard -->
+                <div id="dashboard-page" class="page-content">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="card bg-white rounded-xl p-6 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-500">总用户数</p>
+                                    <p id="totalUsers" class="text-3xl font-bold text-gray-800">-</p>
+                                </div>
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center text-sm">
+                                <span id="todayUsers" class="text-green-600 font-medium">-</span>
+                                <span class="text-gray-400 ml-1">今日新增</span>
+                            </div>
+                        </div>
+
+                        <div class="card bg-white rounded-xl p-6 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-500">总登记数</p>
+                                    <p id="totalRegistrations" class="text-3xl font-bold text-gray-800">-</p>
+                                </div>
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center text-sm">
+                                <span id="todayRegistrations" class="text-green-600 font-medium">-</span>
+                                <span class="text-gray-400 ml-1">今日新增</span>
+                            </div>
+                        </div>
+
+                        <div class="card bg-white rounded-xl p-6 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-500">待审核</p>
+                                    <p id="pendingCount" class="text-3xl font-bold text-gray-800">-</p>
+                                </div>
+                                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <a href="#registrations" class="text-blue-600 text-sm hover:underline">去审核 →</a>
+                            </div>
+                        </div>
+
+                        <div class="card bg-white rounded-xl p-6 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-500">维权案件</p>
+                                    <p id="totalCases" class="text-3xl font-bold text-gray-800">-</p>
+                                </div>
+                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center text-sm">
+                                <span id="processingCases" class="text-yellow-600 font-medium">-</span>
+                                <span class="text-gray-400 ml-1">处理中</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-bold mb-4">近30日登记趋势</h3>
+                            <div id="trendChart" style="height: 300px;"></div>
+                        </div>
+                        <div class="bg-white rounded-xl p-6 shadow-sm">
+                            <h3 class="text-lg font-bold mb-4">待审核列表</h3>
+                            <div id="pendingList" class="space-y-3">
+                                <p class="text-gray-400 text-center py-8">加载中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registrations -->
+                <div id="registrations-page" class="page-content hidden">
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="p-6 border-b flex justify-between items-center">
+                            <div class="flex space-x-4">
+                                <select id="regStatusFilter" class="border rounded-lg px-4 py-2" onchange="loadRegistrations()">
+                                    <option value="">全部状态</option>
+                                    <option value="pending">待审核</option>
+                                    <option value="approved">已通过</option>
+                                    <option value="rejected">已拒绝</option>
+                                </select>
+                                <select id="regCategoryFilter" class="border rounded-lg px-4 py-2" onchange="loadRegistrations()">
+                                    <option value="">全部类型</option>
+                                    <option value="financial">金融数据</option>
+                                    <option value="medical">医疗数据</option>
+                                    <option value="traffic">交通数据</option>
+                                    <option value="education">教育数据</option>
+                                    <option value="industrial">工业数据</option>
+                                </select>
+                            </div>
+                            <button onclick="showRegistrationModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                + 新增登记
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">登记编号</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">数据名称</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">类型</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请人</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">提交时间</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="registrationsTable" class="divide-y divide-gray-100">
+                                    <tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="regPagination" class="p-4 border-t flex justify-center"></div>
+                    </div>
+                </div>
+
+                <!-- Users -->
+                <div id="users-page" class="page-content hidden">
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="p-6 border-b flex justify-between items-center">
+                            <div class="flex space-x-4">
+                                <input type="text" id="userSearch" placeholder="搜索用户..." class="border rounded-lg px-4 py-2" onkeyup="if(event.key==='Enter')loadUsers()">
+                                <select id="userRoleFilter" class="border rounded-lg px-4 py-2" onchange="loadUsers()">
+                                    <option value="">全部角色</option>
+                                    <option value="data_holder">数据持有方</option>
+                                    <option value="data_user">数据使用方</option>
+                                    <option value="regulator">监管方</option>
+                                    <option value="admin">管理员</option>
+                                </select>
+                            </div>
+                            <button onclick="showUserModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                + 新增用户
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">用户名</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">手机号</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">角色/权限</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">认证</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">注册时间</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTable" class="divide-y divide-gray-100">
+                                    <tr><td colspan="8" class="px-6 py-8 text-center text-gray-400">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="userPagination" class="p-4 border-t flex justify-center"></div>
+                    </div>
+                </div>
+
+                <!-- Protection Cases -->
+                <div id="protection-page" class="page-content hidden">
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="p-6 border-b flex justify-between items-center">
+                            <div class="flex space-x-4">
+                                <select id="caseStatusFilter" class="border rounded-lg px-4 py-2" onchange="loadCases()">
+                                    <option value="">全部状态</option>
+                                    <option value="pending">待处理</option>
+                                    <option value="processing">处理中</option>
+                                    <option value="investigating">调查中</option>
+                                    <option value="resolved">已解决</option>
+                                    <option value="rejected">已驳回</option>
+                                    <option value="closed">已关闭</option>
+                                </select>
+                            </div>
+                            <button onclick="showCaseModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                + 新增案件
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">案件编号</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">案件标题</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请人</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">侵权类型</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">进度</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="casesTable" class="divide-y divide-gray-100">
+                                    <tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="casePagination" class="p-4 border-t flex justify-center"></div>
+                    </div>
+                </div>
+
+                <!-- Verification -->
+                <div id="verification-page" class="page-content hidden">
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="p-6 border-b flex justify-between items-center">
+                            <div class="flex space-x-4">
+                                <select id="verificationTypeFilter" class="border rounded-lg px-4 py-2" onchange="loadVerificationApplications()">
+                                    <option value="">全部类型</option>
+                                    <option value="personal">个人认证</option>
+                                    <option value="enterprise">企业认证</option>
+                                </select>
+                                <select id="verificationStatusFilter" class="border rounded-lg px-4 py-2" onchange="loadVerificationApplications()">
+                                    <option value="">全部状态</option>
+                                    <option value="pending">待审核</option>
+                                    <option value="approved">已通过</option>
+                                    <option value="rejected">已拒绝</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">类型</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请人</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">认证信息</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请时间</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="verificationTable" class="divide-y divide-gray-100">
+                                    <tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="verificationPagination" class="p-4 border-t flex justify-center"></div>
+                    </div>
+                </div>
+
+                <!-- Consultations -->
+                <div id="consultations-page" class="page-content hidden">
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="p-6 border-b flex justify-between items-center">
+                            <div class="flex space-x-4">
+                                <select id="consultationStatusFilter" class="border rounded-lg px-4 py-2" onchange="loadConsultations()">
+                                    <option value="">全部状态</option>
+                                    <option value="pending">待处理</option>
+                                    <option value="processing">处理中</option>
+                                    <option value="resolved">已解决</option>
+                                </select>
+                                <select id="consultationTypeFilter" class="border rounded-lg px-4 py-2" onchange="loadConsultations()">
+                                    <option value="">全部类型</option>
+                                    <option value="infringement">侵权咨询</option>
+                                    <option value="contract">合同咨询</option>
+                                    <option value="registration">登记咨询</option>
+                                    <option value="other">其他咨询</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">类型</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">咨询人</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">问题摘要</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">提交时间</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="consultationsTable" class="divide-y divide-gray-100">
+                                    <tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="consultationsPagination" class="p-4 border-t flex justify-center"></div>
+                    </div>
+                </div>
+
+                <!-- Success Cases -->
+                <div id="cases-page" class="page-content hidden">
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="p-6 border-b flex justify-between items-center">
+                            <h3 class="text-lg font-bold">成功案例管理</h3>
+                            <button onclick="showCaseModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                + 添加案例
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">标题</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">类型</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">维权结果</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">涉案金额</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">发布时间</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="successCasesTable" class="divide-y divide-gray-100">
+                                    <tr><td colspan="8" class="px-6 py-8 text-center text-gray-400">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="successCasesPagination" class="p-4 border-t flex justify-center items-center space-x-2"></div>
+                    </div>
+                </div>
+
+                <!-- News -->
+                <div id="news-page" class="page-content hidden">
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="p-6 border-b flex justify-between items-center">
+                            <h3 class="text-lg font-bold">新闻公告管理</h3>
+                            <button onclick="showNewsModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                                + 发布新闻
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">标题</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">分类</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">作者</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">发布时间</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">浏览量</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="newsTable" class="divide-y divide-gray-100">
+                                    <tr><td colspan="7" class="px-6 py-8 text-center text-gray-400">加载中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="newsPagination" class="p-4 border-t flex justify-center items-center space-x-2"></div>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div id="settings-page" class="page-content hidden">
+                    <div class="max-w-2xl bg-white rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold mb-6">系统设置</h3>
+                        <div id="settingsForm" class="space-y-6">
+                            <p class="text-gray-400">加载中...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Site Config -->
+                <div id="site-config-page" class="page-content hidden">
+                    <div class="max-w-5xl">
+                        <!-- Header Config -->
+                        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 class="text-lg font-bold">Header 配置</h3>
+                                    <p class="text-sm text-gray-500">配置网站顶部导航栏</p>
+                                </div>
+                                <button onclick="saveHeaderConfig()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                                    保存 Header
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">网站名称</label>
+                                    <input type="text" id="siteName" class="w-full border rounded-lg px-3 py-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">网站Logo URL</label>
+                                    <input type="text" id="siteLogo" class="w-full border rounded-lg px-3 py-2" placeholder="留空则不显示">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">网站描述</label>
+                                <textarea id="siteDescription" rows="2" class="w-full border rounded-lg px-3 py-2"></textarea>
+                            </div>
+                            <div class="flex items-center space-x-2 mb-4">
+                                <input type="checkbox" id="showLogin" class="w-4 h-4">
+                                <label for="showLogin" class="text-sm">显示登录/注册按钮</label>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-sm font-medium">导航菜单</label>
+                                    <button onclick="addNavItem()" class="text-blue-600 text-sm hover:underline">+ 添加</button>
+                                </div>
+                                <div id="navItemsContainer" class="space-y-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Config -->
+                        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 class="text-lg font-bold">Footer 配置</h3>
+                                    <p class="text-sm text-gray-500">配置网站底部信息</p>
+                                </div>
+                                <button onclick="saveFooterConfig()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                                    保存 Footer
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">联系电话</label>
+                                    <input type="text" id="contactPhone" class="w-full border rounded-lg px-3 py-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">联系邮箱</label>
+                                    <input type="text" id="contactEmail" class="w-full border rounded-lg px-3 py-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">联系地址</label>
+                                    <input type="text" id="contactAddress" class="w-full border rounded-lg px-3 py-2">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">版权文字</label>
+                                    <input type="text" id="copyright" class="w-full border rounded-lg px-3 py-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">备案号</label>
+                                    <input type="text" id="icp" class="w-full border rounded-lg px-3 py-2">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="bg-white rounded-xl shadow-sm p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-bold">批量操作</h3>
+                                    <p class="text-sm text-gray-500">保存所有配置或重置为默认</p>
+                                </div>
+                                <div class="space-x-3">
+                                    <button onclick="resetSiteConfig()" class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg border border-red-200">
+                                        重置为默认
+                                    </button>
+                                    <button onclick="saveAllSiteConfig()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                                        保存所有配置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview -->
+                        <div class="bg-white rounded-xl shadow-sm p-6 mt-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-lg font-bold">实时预览</h3>
+                                    <p class="text-sm text-gray-500">查看配置在前台页面的显示效果</p>
+                                </div>
+                                <div class="space-x-3">
+                                    <button onclick="refreshPreview()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
+                                        🔄 刷新预览
+                                    </button>
+                                    <a href="http://localhost:8888" target="_blank" class="inline-block px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg border border-blue-200">
+                                        在新窗口打开 →
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="border rounded-lg overflow-hidden" style="height: 400px;">
+                                <iframe id="sitePreviewFrame" src="http://localhost:8888" class="w-full h-full border-0"></iframe>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-2">提示：保存配置后，用户需要刷新前台页面才能看到最新效果</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">审核登记</h3>
+            <input type="hidden" id="reviewRegId">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">审核结果</label>
+                    <select id="reviewStatus" class="w-full border rounded-lg px-4 py-2">
+                        <option value="approved">✅ 审核通过</option>
+                        <option value="rejected">❌ 审核拒绝</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">审核意见</label>
+                    <textarea id="reviewComment" class="w-full border rounded-lg px-4 py-2 h-24" placeholder="请输入审核意见..."></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeReviewModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">取消</button>
+                <button onclick="submitReview()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Edit/Create Modal -->
+    <div id="registrationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full my-8">
+            <h3 id="regModalTitle" class="text-xl font-bold mb-4">新增登记</h3>
+            <input type="hidden" id="regModalId">
+            <div class="grid grid-cols-2 gap-4 max-h-[70vh] overflow-y-auto pr-2">
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-2">数据资产名称 <span class="text-red-500">*</span></label>
+                    <input type="text" id="regTitle" class="w-full border rounded-lg px-4 py-2" placeholder="请输入数据资产名称">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">数据分类 <span class="text-red-500">*</span></label>
+                    <select id="regCategory" class="w-full border rounded-lg px-4 py-2">
+                        <option value="financial">金融数据</option>
+                        <option value="medical">医疗数据</option>
+                        <option value="traffic">交通数据</option>
+                        <option value="education">教育数据</option>
+                        <option value="industrial">工业数据</option>
+                        <option value="other">其他数据</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">数据类型 <span class="text-red-500">*</span></label>
+                    <select id="regDataType" class="w-full border rounded-lg px-4 py-2">
+                        <option value="structured">结构化数据</option>
+                        <option value="unstructured">非结构化数据</option>
+                        <option value="semi-structured">半结构化数据</option>
+                        <option value="real-time">实时数据流</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">数据规模</label>
+                    <select id="regDataSize" class="w-full border rounded-lg px-4 py-2">
+                        <option value="small">小型 (&lt; 1GB)</option>
+                        <option value="medium">中型 (1GB - 100GB)</option>
+                        <option value="large">大型 (100GB - 1TB)</option>
+                        <option value="extra-large">超大型 (&gt; 1TB)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">更新频率</label>
+                    <select id="regUpdateFrequency" class="w-full border rounded-lg px-4 py-2">
+                        <option value="real-time">实时更新</option>
+                        <option value="daily">每日更新</option>
+                        <option value="weekly">每周更新</option>
+                        <option value="monthly">每月更新</option>
+                        <option value="quarterly">每季度更新</option>
+                        <option value="yearly">每年更新</option>
+                        <option value="static">静态数据</option>
+                    </select>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-2">数据来源 <span class="text-red-500">*</span></label>
+                    <input type="text" id="regDataSource" class="w-full border rounded-lg px-4 py-2" placeholder="请输入数据来源">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-2">数据格式</label>
+                    <input type="text" id="regDataFormat" class="w-full border rounded-lg px-4 py-2" placeholder="如：JSON, CSV, XML">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-2">应用场景 <span class="text-red-500">*</span></label>
+                    <textarea id="regApplicationScene" class="w-full border rounded-lg px-4 py-2 h-20" placeholder="请描述数据的主要应用场景和价值"></textarea>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-2">预期价值</label>
+                    <textarea id="regExpectedValue" class="w-full border rounded-lg px-4 py-2 h-20" placeholder="请描述数据的预期经济价值和社会价值"></textarea>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-2">详细描述</label>
+                    <textarea id="regDescription" class="w-full border rounded-lg px-4 py-2 h-20" placeholder="请输入详细描述"></textarea>
+                </div>
+                <div class="col-span-2" id="holderSelectContainer">
+                    <label class="block text-sm font-medium mb-2">持有人ID <span class="text-red-500">*</span></label>
+                    <input type="number" id="regHolderId" class="w-full border rounded-lg px-4 py-2" placeholder="请输入持有人用户ID">
+                    <p class="text-xs text-gray-500 mt-1">输入系统中存在的用户ID</p>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button onclick="closeRegistrationModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">取消</button>
+                <button onclick="saveRegistration()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Detail Modal -->
+    <div id="registrationDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full my-8">
+            <h3 class="text-xl font-bold mb-4">登记详情</h3>
+            <div id="registrationDetailContent" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                <!-- 动态填充 -->
+            </div>
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button onclick="closeRegistrationDetailModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg">关闭</button>
+                <button id="detailEditBtn" onclick="editFromDetail()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">编辑</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Edit/Create Modal -->
+    <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl p-8 max-w-xl w-full my-8">
+            <h3 id="userModalTitle" class="text-xl font-bold mb-4">新增用户</h3>
+            <input type="hidden" id="userModalId">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">用户名 <span class="text-red-500">*</span></label>
+                    <input type="text" id="userName" class="w-full border rounded-lg px-4 py-2" placeholder="请输入用户名">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">手机号 <span class="text-red-500">*</span></label>
+                    <input type="text" id="userPhone" class="w-full border rounded-lg px-4 py-2" placeholder="请输入手机号">
+                </div>
+                <div id="passwordContainer">
+                    <label class="block text-sm font-medium mb-2">密码 <span class="text-red-500">*</span></label>
+                    <input type="password" id="userPassword" class="w-full border rounded-lg px-4 py-2" placeholder="至少6位">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">邮箱</label>
+                    <input type="email" id="userEmail" class="w-full border rounded-lg px-4 py-2" placeholder="选填">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">用户角色 <span class="text-red-500">*</span></label>
+                    <select id="userRole" class="w-full border rounded-lg px-4 py-2">
+                        <option value="data_holder">数据持有方</option>
+                        <option value="data_user">数据使用方</option>
+                        <option value="regulator">监管方</option>
+                        <option value="admin">管理员</option>
+                    </select>
+                </div>
+                <div class="flex items-center pt-7">
+                    <input type="checkbox" id="userVerified" class="mr-2">
+                    <label for="userVerified" class="text-sm">已实名认证</label>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">真实姓名</label>
+                    <input type="text" id="userRealName" class="w-full border rounded-lg px-4 py-2" placeholder="选填">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">所属机构/单位 <span class="text-red-500">*</span></label>
+                    <input type="text" id="userOrg" required class="w-full border rounded-lg px-4 py-2" placeholder="请输入所属机构或单位名称">
+                </div>
+            </div>
+            <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                <p class="text-sm text-blue-700 font-medium mb-1">💡 角色权限说明</p>
+                <div class="text-xs text-blue-600 space-y-1">
+                    <p><strong>管理员</strong>: 拥有全部权限，包括系统配置</p>
+                    <p><strong>监管方</strong>: 可审核登记、处理维权案件、查看统计</p>
+                    <p><strong>数据持有方</strong>: 可创建登记、申请维权、管理自己的数据</p>
+                    <p><strong>数据使用方</strong>: 可查看公示数据、申请数据使用</p>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button onclick="closeUserModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">取消</button>
+                <button onclick="saveUser()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div id="userDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl p-8 max-w-xl w-full my-8">
+            <h3 class="text-xl font-bold mb-4">用户详情</h3>
+            <div id="userDetailContent" class="space-y-4">
+                <!-- 动态填充 -->
+            </div>
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button onclick="closeUserDetailModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- News Edit/Create Modal -->
+    <div id="newsEditModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl p-8 max-w-3xl w-full my-8">
+            <h3 id="newsModalTitle" class="text-xl font-bold mb-4">发布新闻</h3>
+            <input type="hidden" id="newsModalId">
+            <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                <div>
+                    <label class="block text-sm font-medium mb-2">标题 <span class="text-red-500">*</span></label>
+                    <input type="text" id="newsTitle" class="w-full border rounded-lg px-4 py-2" placeholder="请输入新闻标题">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">分类</label>
+                        <select id="newsCategory" class="w-full border rounded-lg px-4 py-2">
+                            <option value="平台动态">平台动态</option>
+                            <option value="政策法规">政策法规</option>
+                            <option value="技术动态">技术动态</option>
+                            <option value="通知公告">通知公告</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center pt-7">
+                        <input type="checkbox" id="newsPublished" class="mr-2" checked>
+                        <label for="newsPublished" class="text-sm">立即发布</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">摘要</label>
+                    <input type="text" id="newsSummary" class="w-full border rounded-lg px-4 py-2" placeholder="简短描述新闻内容">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">封面图片URL</label>
+                    <input type="text" id="newsCover" class="w-full border rounded-lg px-4 py-2" placeholder="选填，图片链接地址">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">内容 <span class="text-red-500">*</span></label>
+                    <textarea id="newsContent" class="w-full border rounded-lg px-4 py-2 h-40" placeholder="请输入新闻正文内容，支持HTML"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button onclick="closeNewsEditModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">取消</button>
+                <button onclick="saveNews()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- News Detail Modal -->
+    <div id="newsDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl p-8 max-w-3xl w-full my-8">
+            <h3 class="text-xl font-bold mb-4">新闻详情</h3>
+            <div id="newsDetailContent" class="space-y-4">
+                <!-- 动态填充 -->
+            </div>
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button onclick="closeNewsDetailModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg">关闭</button>
+                <button onclick="editNewsFromDetail()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">编辑</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Detail Modal -->
+    <div id="caseDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full my-8">
+            <h3 class="text-xl font-bold mb-4">案件详情</h3>
+            <div id="caseDetailContent" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                <!-- 动态填充 -->
+            </div>
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button onclick="closeCaseDetailModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg">关闭</button>
+                <button onclick="editCaseFromDetail()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">编辑</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Edit/Create Modal -->
+    <div id="caseEditModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full my-8">
+            <h3 id="caseModalTitle" class="text-xl font-bold mb-4">新增案件</h3>
+            <input type="hidden" id="caseModalId">
+            <div class="grid grid-cols-2 gap-4 max-h-[70vh] overflow-y-auto pr-2">
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-2">案件标题 <span class="text-red-500">*</span></label>
+                    <input type="text" id="caseTitle" class="w-full border rounded-lg px-4 py-2" placeholder="请输入案件标题">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">申请人姓名 <span class="text-red-500">*</span></label>
+                    <input type="text" id="caseApplicantName" class="w-full border rounded-lg px-4 py-2" placeholder="请输入申请人姓名">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">申请人电话</label>
+                    <input type="text" id="caseApplicantPhone" class="w-full border rounded-lg px-4 py-2" placeholder="请输入联系电话">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">侵权类型</label>
+                    <select id="caseInfringementType" class="w-full border rounded-lg px-4 py-2">
+                        <option value="copyright">著作权侵权</option>
+                        <option value="trademark">商标侵权</option>
+                        <option value="trade_secret">商业秘密侵权</option>
+                        <option value="data_breach">数据泄露</option>
+                        <option value="unauthorized_use">未授权使用</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-2">侵权描述 <span class="text-red-500">*</span></label>
+                    <textarea id="caseDescription" class="w-full border rounded-lg px-4 py-2 h-24" placeholder="请详细描述侵权情况"></textarea>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-2">侵权方信息</label>
+                    <textarea id="caseInfringerInfo" class="w-full border rounded-lg px-4 py-2 h-20" placeholder="请提供侵权方的相关信息"></textarea>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-2">期望解决方案</label>
+                    <textarea id="caseExpectedSolution" class="w-full border rounded-lg px-4 py-2 h-20" placeholder="请输入期望的解决方案"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button onclick="closeCaseEditModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">取消</button>
+                <button onclick="saveCase()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Status Update Modal -->
+    <div id="caseStatusModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">更新案件状态</h3>
+            <input type="hidden" id="caseStatusCaseId">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">案件状态</label>
+                    <select id="caseStatusSelect" class="w-full border rounded-lg px-4 py-2">
+                        <option value="pending">待处理</option>
+                        <option value="processing">处理中</option>
+                        <option value="investigating">调查中</option>
+                        <option value="resolved">已解决</option>
+                        <option value="rejected">已驳回</option>
+                        <option value="closed">已关闭</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">处理进度 (%)</label>
+                    <input type="number" id="caseProgress" min="0" max="100" class="w-full border rounded-lg px-4 py-2" placeholder="0-100">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">处理意见</label>
+                    <textarea id="caseHandleComment" class="w-full border rounded-lg px-4 py-2 h-24" placeholder="请输入处理意见..."></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeCaseStatusModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">取消</button>
+                <button onclick="submitCaseStatusUpdate()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+    <script src="admin-verification.js"></script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+JWT_SECRET loaded: Yes (length: 41)
+
+╔════════════════════════════════════════════════════════════╗
+║     天津数据产权登记服务平台 - 后端API服务                  ║
+╠════════════════════════════════════════════════════════════╣
+║  服务地址: http://localhost:3002                         ║
+║  API文档:  http://localhost:3002/api                     ║
+║  健康检查: http://localhost:3002/api/health              ║
+╚════════════════════════════════════════════════════════════╝
+    
+✅ 数据库连接成功
+[0mGET /api/health [32m200[0m 48.284 ms - 138[0m
+[0mGET /api/verification/status [33m401[0m 16.819 ms - 110[0m
+[0mGET /api/site-config [32m200[0m 26.852 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 14.229 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 3.475 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 3.536 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.685 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.489 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.358 ms - 1440[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 12.978 ms - 1476[0m
+[0mGET /api/news?pageSize=5 [32m200[0m 4.088 ms - 1552[0m
+[0mGET /api/admin/users?page=1&keyword=&role= [32m200[0m 19.926 ms - 2174[0m
+[0mPOST /api/auth/login [32m200[0m 124.671 ms - 543[0m
+[0mGET /api/site-config [32m200[0m 5.051 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 10.324 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 3.518 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.148 ms - 1440[0m
+[0mGET /api/auth/me [32m200[0m 4.953 ms - 392[0m
+[0mGET /api/auth/activities [32m200[0m 16.022 ms - 512[0m
+[0mGET /api/auth/notifications [32m200[0m 4.597 ms - 220[0m
+[0mGET /api/verification/status [32m200[0m 3.429 ms - 492[0m
+[0mGET /api/site-config [32m200[0m 2.903 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.466 ms - 1440[0m
+[0mGET /api/verification/status [32m200[0m 10.882 ms - 492[0m
+登记提交 - 用户认证状态: {
+  userId: 20,
+  verified: 1,
+  verifiedType: 'number',
+  real_name: '刘章',
+  organization: '津数宝科技有限公司'
+}
+[0mPOST /api/registrations [32m201[0m 19.528 ms - 145[0m
+保存文件信息错误: Error: SQLITE_CONSTRAINT: NOT NULL constraint failed: registration_files.file_url
+--> in Statement#run([
+  '40',
+  'sample',
+  'W020251212323587001680.xlsx',
+  'W020251212323587001680.xlsx',
+  '/Users/jackren/Desktop/work/datadj/backend/uploads/registrations/20260307/sample-1772880394014-135415395.xlsx',
+  15248,
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+], [Function (anonymous)])
+    at Database.<anonymous> (/Users/jackren/Desktop/work/datadj/backend/node_modules/sqlite3/lib/sqlite3.js:76:19)
+    at Database.<anonymous> (/Users/jackren/Desktop/work/datadj/backend/node_modules/sqlite3/lib/sqlite3.js:20:19)
+    at /Users/jackren/Desktop/work/datadj/backend/database.js:27:16
+    at new Promise (<anonymous>)
+    at Object.run (/Users/jackren/Desktop/work/datadj/backend/database.js:26:16)
+    at /Users/jackren/Desktop/work/datadj/backend/routes/upload.js:125:46
+    at Layer.handle [as handle_request] (/Users/jackren/Desktop/work/datadj/backend/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/jackren/Desktop/work/datadj/backend/node_modules/express/lib/router/route.js:149:13) {
+  errno: 19,
+  code: 'SQLITE_CONSTRAINT',
+  __augmented: true
+}
+[0mPOST /api/upload/40 [31m500[0m 17.560 ms - 104[0m
+[0mGET /api/admin/registrations?page=1&status=&category= [32m200[0m 6.440 ms - 9714[0m
+[0mGET /api/admin/registrations/40 [32m200[0m 3.802 ms - 957[0m
+[0mPUT /api/admin/registrations/40/review [32m200[0m 5.570 ms - 98[0m
+[0mGET /api/admin/registrations?page=1&status=&category= [32m200[0m 3.897 ms - 9748[0m
+[0mGET /api/admin/dashboard [32m200[0m 5.040 ms - 2138[0m
+[0mGET /api/site-config [32m200[0m 19.352 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 13.258 ms - 1440[0m
+[0mGET /api/registrations?status=approved&page=1&pageSize=100 [32m200[0m 7.877 ms - 26475[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 4.284 ms - 1476[0m
+[0mGET /api/site-config [32m200[0m 1.999 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.269 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 3.465 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 3.278 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.647 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.553 ms - 1440[0m
+[0mGET /api/auth/me [32m200[0m 2.881 ms - 392[0m
+[0mGET /api/auth/activities [32m200[0m 3.644 ms - 895[0m
+[0mGET /api/auth/notifications [32m200[0m 3.880 ms - 431[0m
+[0mGET /api/verification/status [32m200[0m 3.786 ms - 492[0m
+[0mGET /api/site-config [32m200[0m 1.232 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.390 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.757 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 3.236 ms - 1440[0m
+[0mGET /api/registrations?status=approved&page=1&pageSize=100 [32m200[0m 5.750 ms - 26475[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 5.308 ms - 1476[0m
+[0mGET /api/site-config [32m200[0m 3.766 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 4.341 ms - 1440[0m
+[0mGET /api/consultation/cases?limit=5 [32m200[0m 7.894 ms - 834[0m
+[0mGET /api/consultation/stats [32m200[0m 4.190 ms - 144[0m
+[0mGET /api/protection [32m200[0m 9.856 ms - 780[0m
+[0mGET /api/registrations?pageSize=100 [32m200[0m 4.377 ms - 26475[0m
+[0mGET /api/consultation/case-stats [32m200[0m 1.137 ms - 157[0m
+[0mGET /api/site-config [32m200[0m 6.046 ms - 1440[0m
+[0mGET /api/admin/dashboard [32m200[0m 4.766 ms - 2138[0m
+[0mGET /api/site-config [32m200[0m 27.373 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 15.405 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 15.403 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 15.326 ms - 1440[0m
+[0mGET /api/auth/me [32m200[0m 12.661 ms - 392[0m
+[0mGET /api/auth/activities [32m200[0m 2.834 ms - 895[0m
+[0mGET /api/auth/notifications [32m200[0m 4.139 ms - 431[0m
+[0mGET /api/verification/status [32m200[0m 5.171 ms - 492[0m
+[0mGET /api/site-config [32m200[0m 2.849 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.644 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 0.441 ms - 1440[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 11.167 ms - 1476[0m
+[0mGET /api/news?pageSize=5 [32m200[0m 34.071 ms - 1552[0m
+[0mGET /admin/index.html [32m200[0m 34.968 ms - 66254[0m
+[0mGET /admin/admin-verification.js [32m200[0m 2.134 ms - 12080[0m
+[0mGET /admin/admin.js [32m200[0m 4.069 ms - 123974[0m
+[0mGET /api/auth/me [32m200[0m 33.899 ms - 416[0m
+[0mGET /api/admin/dashboard [32m200[0m 4.746 ms - 2138[0m
+[0mGET /api/site-config [32m200[0m 2.509 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.591 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.490 ms - 1440[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 3.033 ms - 1476[0m
+[0mGET /api/news?pageSize=5 [32m200[0m 3.188 ms - 1552[0m
+[0mGET /api/site-config [32m200[0m 1.714 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.016 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.299 ms - 1440[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 2.461 ms - 1476[0m
+[0mGET /api/news?pageSize=5 [32m200[0m 0.758 ms - 1552[0m
+[0mGET /api/admin/users?page=1&keyword=&role= [32m200[0m 7.792 ms - 2174[0m
+[0mPOST /api/auth/login [32m200[0m 113.156 ms - 543[0m
+[0mGET /api/site-config [32m200[0m 1.375 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 0.981 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.225 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.763 ms - 1440[0m
+[0mGET /api/auth/me [32m200[0m 2.494 ms - 392[0m
+[0mGET /api/auth/activities [32m200[0m 3.641 ms - 895[0m
+[0mGET /api/auth/notifications [32m200[0m 3.288 ms - 431[0m
+[0mGET /api/verification/status [32m200[0m 11.498 ms - 492[0m
+[0mGET /api/site-config [32m200[0m 1.409 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.757 ms - 1440[0m
+[0mGET /api/registrations?status=approved&page=1&pageSize=100 [32m200[0m 5.821 ms - 26475[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 5.475 ms - 1476[0m
+[0mGET /api/site-config [32m200[0m 1.590 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.586 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 3.934 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 4.592 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 4.780 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 4.615 ms - 1440[0m
+[0mGET /api/auth/me [32m200[0m 3.325 ms - 392[0m
+[0mGET /api/auth/activities [32m200[0m 2.258 ms - 895[0m
+[0mGET /api/auth/notifications [32m200[0m 2.359 ms - 431[0m
+[0mGET /api/verification/status [32m200[0m 4.345 ms - 492[0m
+[0mGET /api/site-config [32m200[0m 0.893 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.134 ms - 1440[0m
+[0mGET /api/registrations?status=approved&page=1&pageSize=100 [32m200[0m 7.588 ms - 26475[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 12.618 ms - 1476[0m
+[0mGET /api/site-config [32m200[0m 3.400 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 3.026 ms - 1440[0m
+[0mGET /api/verification/status [32m200[0m 12.967 ms - 492[0m
+登记提交 - 用户认证状态: {
+  userId: 20,
+  verified: 1,
+  verifiedType: 'number',
+  real_name: '刘章',
+  organization: '津数宝科技有限公司'
+}
+[0mPOST /api/registrations [32m201[0m 20.298 ms - 145[0m
+保存文件信息错误: Error: SQLITE_CONSTRAINT: NOT NULL constraint failed: registration_files.file_url
+--> in Statement#run([
+  '41',
+  'sample',
+  'W020230824391608166061.xlsx',
+  'W020230824391608166061.xlsx',
+  '/Users/jackren/Desktop/work/datadj/backend/uploads/registrations/20260309/sample-1773043192450-303282456.xlsx',
+  60144,
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+], [Function (anonymous)])
+    at Database.<anonymous> (/Users/jackren/Desktop/work/datadj/backend/node_modules/sqlite3/lib/sqlite3.js:76:19)
+    at Database.<anonymous> (/Users/jackren/Desktop/work/datadj/backend/node_modules/sqlite3/lib/sqlite3.js:20:19)
+    at /Users/jackren/Desktop/work/datadj/backend/database.js:27:16
+    at new Promise (<anonymous>)
+    at Object.run (/Users/jackren/Desktop/work/datadj/backend/database.js:26:16)
+    at /Users/jackren/Desktop/work/datadj/backend/routes/upload.js:125:46
+    at Layer.handle [as handle_request] (/Users/jackren/Desktop/work/datadj/backend/node_modules/express/lib/router/layer.js:95:5)
+    at next (/Users/jackren/Desktop/work/datadj/backend/node_modules/express/lib/router/route.js:149:13) {
+  errno: 19,
+  code: 'SQLITE_CONSTRAINT',
+  __augmented: true
+}
+[0mPOST /api/upload/41 [31m500[0m 11.317 ms - 104[0m
+[0mGET /api/site-config [32m200[0m 1.089 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.337 ms - 1440[0m
+[0mGET /api/registrations?status=approved&page=1&pageSize=100 [32m200[0m 5.125 ms - 26475[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 6.206 ms - 1476[0m
+[0mGET /api/site-config [32m200[0m 1.481 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.523 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.041 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.125 ms - 1440[0m
+[0mGET /api/auth/me [32m200[0m 2.798 ms - 392[0m
+[0mGET /api/auth/activities [32m200[0m 2.568 ms - 1132[0m
+[0mGET /api/auth/notifications [32m200[0m 2.752 ms - 431[0m
+[0mGET /api/verification/status [32m200[0m 4.980 ms - 492[0m
+[0mGET /api/admin/dashboard [32m200[0m 3.526 ms - 2121[0m
+[0mPUT /api/admin/registrations/36/review [32m200[0m 13.446 ms - 98[0m
+[0mGET /api/admin/registrations?page=1&status=&category= [32m200[0m 3.827 ms - 10633[0m
+[0mGET /api/admin/dashboard [32m200[0m 8.285 ms - 2125[0m
+[0mPUT /api/admin/registrations/41/review [32m200[0m 6.999 ms - 98[0m
+[0mGET /api/admin/dashboard [32m200[0m 8.597 ms - 2144[0m
+[0mGET /api/admin/registrations?page=1&status=&category= [32m200[0m 5.508 ms - 10669[0m
+[0mGET /api/admin/registrations?page=1&status=&category= [32m200[0m 3.367 ms - 10669[0m
+[0mGET /api/admin/dashboard [32m200[0m 5.034 ms - 2144[0m
+[0mGET /admin/index.html [32m200[0m 6.063 ms - 66254[0m
+[0mGET /admin/admin.js [36m304[0m 2.058 ms - -[0m
+[0mGET /admin/admin-verification.js [36m304[0m 0.518 ms - -[0m
+[0mGET /api/auth/me [32m200[0m 2.690 ms - 416[0m
+[0mGET /api/admin/dashboard [32m200[0m 4.796 ms - 2144[0m
+[0mGET /api/site-config [32m200[0m 2.309 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.749 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.324 ms - 1440[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 1.834 ms - 1476[0m
+[0mGET /api/news?pageSize=5 [32m200[0m 1.582 ms - 1552[0m
+[0mGET /api/admin/registrations?page=1&status=&category= [32m200[0m 4.980 ms - 10669[0m
+[0mGET /api/site-config [32m200[0m 2.049 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.365 ms - 1440[0m
+[0mGET /api/registrations?status=approved&page=1&pageSize=100 [32m200[0m 8.540 ms - 29878[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 6.438 ms - 1476[0m
+[0mGET /api/site-config [32m200[0m 0.953 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.196 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 1.589 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 2.089 ms - 1440[0m
+[0mGET /api/auth/me [32m200[0m 2.192 ms - 392[0m
+[0mGET /api/auth/activities [32m200[0m 2.400 ms - 1132[0m
+[0mGET /api/auth/notifications [32m200[0m 2.624 ms - 569[0m
+[0mGET /api/verification/status [32m200[0m 5.150 ms - 492[0m
+[0mGET /api/site-config [32m200[0m 2.447 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 4.247 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 0.760 ms - 1440[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 9.600 ms - 1476[0m
+[0mGET /api/news?pageSize=5 [32m200[0m 0.998 ms - 1552[0m
+[0mGET /api/admin/dashboard [32m200[0m 10.529 ms - 2144[0m
+[0mGET /api/admin/dashboard [32m200[0m 4.195 ms - 2144[0m
+[0mGET /api/admin/registrations?page=1&status=&category= [32m200[0m 5.559 ms - 10669[0m
+[0mGET /api/admin/dashboard [32m200[0m 6.406 ms - 2144[0m
+[0mGET /api/admin/users?page=1&keyword=&role= [32m200[0m 3.360 ms - 2174[0m
+[0mGET /api/admin/users?page=2&keyword=&role= [32m200[0m 3.760 ms - 1261[0m
+[0mGET /api/admin/dashboard [32m200[0m 4.796 ms - 2144[0m
+[0mGET /api/admin/cases?page=1&status= [32m200[0m 6.507 ms - 7428[0m
+[0mPUT /api/admin/cases/31/status [32m200[0m 7.559 ms - 98[0m
+[0mGET /api/admin/cases?page=1&status= [32m200[0m 4.154 ms - 7444[0m
+[0mGET /api/admin/dashboard [32m200[0m 3.697 ms - 2144[0m
+[0mGET /api/admin/registrations?page=1&status=&category= [32m200[0m 2.985 ms - 10669[0m
+[0mGET /api/admin/users?page=1&keyword=&role= [32m200[0m 3.487 ms - 2174[0m
+[0mGET /api/site-config [32m200[0m 27.977 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 19.469 ms - 1440[0m
+[0mGET /api/site-config [32m200[0m 4.699 ms - 1440[0m
+[0mGET /api/registrations/stats/overview [32m200[0m 5.374 ms - 1476[0m
+[0mGET /api/news?pageSize=5 [32m200[0m 1.778 ms - 1552[0m

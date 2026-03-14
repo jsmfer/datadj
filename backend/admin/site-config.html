@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站配置管理 - 天津数据产权登记平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: #f5f7fa;
+        }
+        .glass-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        .nav-item:hover {
+            background: #f3f4f6;
+        }
+        .nav-item.active {
+            background: #dbeafe;
+            color: #1e40af;
+            border-right: 3px solid #3b82f6;
+        }
+        .preview-frame {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg">
+            <div class="p-6 border-b">
+                <h1 class="text-xl font-bold text-blue-600">网站配置管理</h1>
+                <p class="text-sm text-gray-500 mt-1">Header & Footer 设置</p>
+            </div>
+            <nav class="p-4">
+                <a href="#header-section" class="nav-item active flex items-center space-x-3 px-4 py-3 rounded-lg" onclick="switchTab('header')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    <span>Header 配置</span>
+                </a>
+                <a href="#footer-section" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg mt-2" onclick="switchTab('footer')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                    <span>Footer 配置</span>
+                </a>
+                <a href="#preview-section" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg mt-2" onclick="switchTab('preview')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    <span>实时预览</span>
+                </a>
+            </nav>
+            <div class="absolute bottom-0 w-64 p-4 border-t bg-white">
+                <button onclick="saveAllConfig()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">
+                    保存所有配置
+                </button>
+                <button onclick="resetConfig()" class="w-full mt-2 text-gray-500 hover:text-red-500 py-2 text-sm transition-colors">
+                    重置为默认
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-auto">
+            <div class="p-8 max-w-5xl">
+                <!-- Header 配置区 -->
+                <section id="header-section" class="config-section">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">Header 配置</h2>
+                            <p class="text-gray-500">配置网站顶部导航栏的显示内容</p>
+                        </div>
+                        <button onclick="saveHeaderConfig()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
+                            保存 Header 配置
+                        </button>
+                    </div>
+
+                    <div class="glass-card p-6 mb-6">
+                        <h3 class="text-lg font-semibold mb-4">基本信息</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">网站名称</label>
+                                <input type="text" id="siteName" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">网站Logo URL</label>
+                                <input type="text" id="siteLogo" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="留空则不显示">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium mb-2">网站描述</label>
+                                <textarea id="siteDescription" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold">导航菜单</h3>
+                            <button onclick="addNavItem()" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                + 添加菜单项
+                            </button>
+                        </div>
+                        <div id="navItemsContainer" class="space-y-3">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4">显示设置</h3>
+                        <div class="flex items-center space-x-4">
+                            <input type="checkbox" id="showLogin" class="w-4 h-4 text-blue-600 rounded">
+                            <label for="showLogin" class="text-sm">显示登录/注册按钮</label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Footer 配置区 -->
+                <section id="footer-section" class="config-section hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">Footer 配置</h2>
+                            <p class="text-gray-500">配置网站底部信息</p>
+                        </div>
+                        <button onclick="saveFooterConfig()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
+                            保存 Footer 配置
+                        </button>
+                    </div>
+
+                    <div class="glass-card p-6 mb-6">
+                        <h3 class="text-lg font-semibold mb-4">联系信息</h3>
+                        <div class="grid grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">联系电话</label>
+                                <input type="text" id="contactPhone" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">联系邮箱</label>
+                                <input type="text" id="contactEmail" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">联系地址</label>
+                                <input type="text" id="contactAddress" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 mb-6">
+                        <h3 class="text-lg font-semibold mb-4">版权信息</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">版权文字</label>
+                                <input type="text" id="copyright" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">备案号 (ICP)</label>
+                                <input type="text" id="icp" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4">链接设置</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">关于我们链接 (JSON格式)</label>
+                                <textarea id="aboutLinks" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 font-mono text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">服务支持链接 (JSON格式)</label>
+                                <textarea id="serviceLinks" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 font-mono text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">帮助中心链接 (JSON格式)</label>
+                                <textarea id="helpLinks" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 font-mono text-sm"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 预览区 -->
+                <section id="preview-section" class="config-section hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">实时预览</h2>
+                            <p class="text-gray-500">查看配置效果</p>
+                        </div>
+                        <a href="http://localhost:8888" target="_blank" class="text-blue-600 hover:text-blue-700 text-sm">
+                            在新窗口打开网站 →
+                        </a>
+                    </div>
+                    <div class="preview-frame h-96">
+                        <iframe id="previewFrame" src="http://localhost:8888" class="w-full h-full border-0"></iframe>
+                    </div>
+                    <button onclick="refreshPreview()" class="mt-4 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                        🔄 刷新预览
+                    </button>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE = '/api/site-config';
+        let currentConfig = {};
+
+        // 获取token
+        function getToken() {
+            return localStorage.getItem('token') || sessionStorage.getItem('token');
+        }
+
+        // 获取请求头
+        function getHeaders() {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            const token = getToken();
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            return headers;
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 检查登录状态
+            if (!getToken()) {
+                alert('请先登录');
+                window.location.href = 'login.html';
+                return;
+            }
+            await loadConfig();
+        });
+
+        // 加载配置
+        async function loadConfig() {
+            try {
+                const response = await fetch(API_BASE);
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentConfig = result.data;
+                    fillFormData(result.data);
+                }
+            } catch (error) {
+                console.error('加载配置失败:', error);
+                alert('加载配置失败，请刷新页面重试');
+            }
+        }
+
+        // 填充表单数据
+        function fillFormData(config) {
+            // Header 配置
+            document.getElementById('siteName').value = config.siteName || '';
+            document.getElementById('siteLogo').value = config.logo || '';
+            document.getElementById('siteDescription').value = config.description || '';
+            document.getElementById('showLogin').checked = config.showLogin !== false;
+            
+            // 导航菜单
+            renderNavItems(config.navItems || []);
+
+            // Footer 配置
+            const footer = config.footer || {};
+            document.getElementById('contactPhone').value = footer.contact?.phone || '';
+            document.getElementById('contactEmail').value = footer.contact?.email || '';
+            document.getElementById('contactAddress').value = footer.contact?.address || '';
+            document.getElementById('copyright').value = footer.copyright || '';
+            document.getElementById('icp').value = footer.icp || '';
+            
+            // 链接配置
+            document.getElementById('aboutLinks').value = JSON.stringify(footer.links?.about || [], null, 2);
+            document.getElementById('serviceLinks').value = JSON.stringify(footer.links?.service || [], null, 2);
+            document.getElementById('helpLinks').value = JSON.stringify(footer.links?.help || [], null, 2);
+        }
+
+        // 渲染导航菜单项
+        function renderNavItems(items) {
+            const container = document.getElementById('navItemsContainer');
+            container.innerHTML = items.map((item, index) => `
+                <div class="flex items-center space-x-3 bg-gray-50 p-3 rounded-lg">
+                    <input type="text" value="${item.name}" placeholder="菜单名称" 
+                           class="nav-item-name flex-1 border border-gray-300 rounded px-3 py-1 text-sm">
+                    <input type="text" value="${item.href}" placeholder="链接地址" 
+                           class="nav-item-href flex-1 border border-gray-300 rounded px-3 py-1 text-sm">
+                    <button onclick="removeNavItem(${index})" class="text-red-500 hover:text-red-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // 添加导航项
+        function addNavItem() {
+            const container = document.getElementById('navItemsContainer');
+            const div = document.createElement('div');
+            div.className = 'flex items-center space-x-3 bg-gray-50 p-3 rounded-lg';
+            div.innerHTML = `
+                <input type="text" placeholder="菜单名称" class="nav-item-name flex-1 border border-gray-300 rounded px-3 py-1 text-sm">
+                <input type="text" placeholder="链接地址" class="nav-item-href flex-1 border border-gray-300 rounded px-3 py-1 text-sm">
+                <button onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        // 删除导航项
+        function removeNavItem(index) {
+            const items = document.querySelectorAll('#navItemsContainer > div');
+            if (items[index]) {
+                items[index].remove();
+            }
+        }
+
+        // 获取导航项数据
+        function getNavItems() {
+            const items = [];
+            document.querySelectorAll('#navItemsContainer > div').forEach(div => {
+                const name = div.querySelector('.nav-item-name').value;
+                const href = div.querySelector('.nav-item-href').value;
+                if (name && href) {
+                    items.push({ id: name.toLowerCase().replace(/\s+/g, '-'), name, href });
+                }
+            });
+            return items;
+        }
+
+        // 保存 Header 配置
+        async function saveHeaderConfig() {
+            const config = {
+                siteName: document.getElementById('siteName').value,
+                logo: document.getElementById('siteLogo').value,
+                description: document.getElementById('siteDescription').value,
+                showLogin: document.getElementById('showLogin').checked,
+                navItems: getNavItems()
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/header`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify(config)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert('Header 配置保存成功！');
+                    refreshPreview();
+                } else {
+                    alert('保存失败: ' + result.message);
+                }
+            } catch (error) {
+                console.error('保存配置失败:', error);
+                alert('保存失败，请检查网络连接');
+            }
+        }
+
+        // 保存 Footer 配置
+        async function saveFooterConfig() {
+            const config = {
+                contact: {
+                    phone: document.getElementById('contactPhone').value,
+                    email: document.getElementById('contactEmail').value,
+                    address: document.getElementById('contactAddress').value
+                },
+                copyright: document.getElementById('copyright').value,
+                icp: document.getElementById('icp').value,
+                links: {
+                    about: JSON.parse(document.getElementById('aboutLinks').value || '[]'),
+                    service: JSON.parse(document.getElementById('serviceLinks').value || '[]'),
+                    help: JSON.parse(document.getElementById('helpLinks').value || '[]')
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/footer`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify(config)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert('Footer 配置保存成功！');
+                    refreshPreview();
+                } else {
+                    alert('保存失败: ' + result.message);
+                }
+            } catch (error) {
+                console.error('保存配置失败:', error);
+                alert('保存失败，请检查网络连接');
+            }
+        }
+
+        // 保存所有配置
+        async function saveAllConfig() {
+            await saveHeaderConfig();
+            await saveFooterConfig();
+        }
+
+        // 重置配置
+        async function resetConfig() {
+            if (!confirm('确定要将所有配置重置为默认值吗？')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/reset`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ type: 'all' })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert('配置已重置为默认值！');
+                    await loadConfig();
+                    refreshPreview();
+                }
+            } catch (error) {
+                console.error('重置配置失败:', error);
+                alert('重置失败');
+            }
+        }
+
+        // 切换标签页
+        function switchTab(tab) {
+            // 更新导航状态
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+
+            // 显示对应内容
+            document.querySelectorAll('.config-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(`${tab}-section`).classList.remove('hidden');
+        }
+
+        // 刷新预览
+        function refreshPreview() {
+            const frame = document.getElementById('previewFrame');
+            frame.src = frame.src;
+        }
+    </script>
+</body>
+</html>

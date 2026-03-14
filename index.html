@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天津数据产权登记服务平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- 加载布局组件 -->
+    <script src="js/components/simple-layout.js"></script>
+    
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --secondary-blue: #3b82f6;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --error-red: #ef4444;
+            --neutral-gray: #6b7280;
+            --light-gray: #f3f4f6;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+        
+        .hero-title {
+            font-family: 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #10b981, #059669);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-2px);
+            color: #3b82f6;
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+        }
+        
+        .stats-number {
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 700;
+        }
+        
+        #p5-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        /* 页面内容区域 */
+        .page-content {
+            padding-top: 0;
+        }
+    </style>
+</head>
+<body class="text-white" data-layout-init data-current-page="home">
+    <!-- P5.js Background Canvas -->
+    <div id="p5-background"></div>
+    
+    <!-- Header 容器 - 由组件动态加载 -->
+    <div id="header-container"></div>
+    
+    <!-- 页面主体内容 -->
+    <main class="page-content">
+        <!-- Hero Section -->
+        <section id="home" class="pt-20 pb-16 relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-8">
+                        <h1 class="hero-title text-5xl lg:text-6xl font-bold leading-tight" id="site-title">
+                            天津数据产权登记服务平台
+                        </h1>
+                        <p class="text-xl text-gray-300 leading-relaxed" id="site-description">
+                            构建权威、高效、可信的数据产权登记体系，为数据资产赋予清晰、可追溯的产权标识，
+                            实现数据产权的全生命周期管理，推动数字经济产业生态繁荣发展。
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <button onclick="handleRegisterClick()" class="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105">
+                                立即登记
+                            </button>
+                            <button onclick="window.location.href='search.html'" class="border border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white px-8 py-3 rounded-lg font-medium transition-all">
+                                查询公示
+                            </button>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <div class="floating-animation">
+                            <img src="resources/hero-bg.jpg" alt="数据平台" class="w-full h-96 object-cover rounded-2xl shadow-2xl">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Platform Stats -->
+        <section class="py-16 bg-black bg-opacity-30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div class="text-center">
+                        <div class="stats-number text-4xl font-bold text-blue-400 mb-2" data-count="15860">0</div>
+                        <div class="text-gray-300">登记数据项</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-number text-4xl font-bold text-green-400 mb-2" data-count="3240">0</div>
+                        <div class="text-gray-300">注册用户</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-number text-4xl font-bold text-yellow-400 mb-2" data-count="98">0</div>
+                        <div class="text-gray-300">成功率(%)</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-number text-4xl font-bold text-purple-400 mb-2" data-count="256">0</div>
+                        <div class="text-gray-300">维权案例</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Features -->
+        <section class="py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4 gradient-text">核心服务功能</h2>
+                    <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                        基于区块链、大数据、人工智能等前沿技术，构建全方位的数据产权服务体系
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="feature-card glass-card p-8 rounded-2xl text-center">
+                        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">产权登记</h3>
+                        <p class="text-gray-300 mb-6">在线申报、智能审核、全流程管理，为数据资产赋予清晰产权标识</p>
+                        <button onclick="handleRegisterClick()" class="text-blue-400 hover:text-blue-300 font-medium">
+                            了解更多 →
+                        </button>
+                    </div>
+
+                    <div class="feature-card glass-card p-8 rounded-2xl text-center">
+                        <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">查询公示</h3>
+                        <p class="text-gray-300 mb-6">一站式搜索服务，可视化信息展示，全方位了解数据资产状况</p>
+                        <button onclick="window.location.href='search.html'" class="text-green-400 hover:text-green-300 font-medium">
+                            立即查询 →
+                        </button>
+                    </div>
+
+                    <div class="feature-card glass-card p-8 rounded-2xl text-center">
+                        <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">维权服务</h3>
+                        <p class="text-gray-300 mb-6">侵权监测预警，专业维权援助，全方位保护数据合法权益</p>
+                        <button onclick="window.location.href='protect.html'" class="text-purple-400 hover:text-purple-300 font-medium">
+                            申请维权 →
+                        </button>
+                    </div>
+
+                    <div class="feature-card glass-card p-8 rounded-2xl text-center">
+                        <div class="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">智能技术</h3>
+                        <p class="text-gray-300 mb-6">区块链存证、AI审核、大数据分析，确保信息安全不可篡改</p>
+                        <button onclick="showTechModal()" class="text-orange-400 hover:text-orange-300 font-medium">
+                            技术详情 →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Visualization -->
+        <section class="py-20 bg-black bg-opacity-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4 gradient-text">平台数据概览</h2>
+                    <p class="text-xl text-gray-300">实时展示平台运行状态和数据产权登记情况</p>
+                </div>
+                
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <div class="glass-card p-8 rounded-2xl">
+                        <h3 class="text-2xl font-bold mb-6 text-center">数据类型分布</h3>
+                        <div id="dataTypeChart" style="height: 300px;"></div>
+                    </div>
+                    
+                    <div class="glass-card p-8 rounded-2xl">
+                        <h3 class="text-2xl font-bold mb-6 text-center">近30日登记趋势</h3>
+                        <div id="trendChart" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Service Process -->
+        <section class="py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4 gradient-text">服务流程</h2>
+                    <p class="text-xl text-gray-300">简单四步，完成数据产权登记</p>
+                </div>
+                
+                <div class="grid md:grid-cols-4 gap-8">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
+                            1
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">注册认证</h3>
+                        <p class="text-gray-300">完成用户注册和实名认证，获得平台使用权限</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
+                            2
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">提交申请</h3>
+                        <p class="text-gray-300">填写登记信息，上传相关证明材料和数据样本</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
+                            3
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">审核公示</h3>
+                        <p class="text-gray-300">平台智能审核，通过后在公示区发布信息</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">
+                            4
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">获得证书</h3>
+                        <p class="text-gray-300">公示期结束后，颁发数据产权登记证书</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- News Carousel -->
+        <section class="py-20 bg-black bg-opacity-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4 gradient-text">新闻公告</h2>
+                    <p class="text-xl text-gray-300">了解平台最新动态和政策法规</p>
+                </div>
+                
+                <div class="splide" id="news-carousel">
+                    <div class="splide__track">
+                        <ul class="splide__list">
+                            <li class="splide__slide">
+                                <div class="glass-card p-8 rounded-2xl">
+                                    <div class="text-sm text-blue-400 mb-2">2024-11-20</div>
+                                    <h3 class="text-xl font-bold mb-4">《数据产权登记管理办法》正式发布</h3>
+                                    <p class="text-gray-300 mb-4">为进一步规范数据产权登记行为，保护数据产权人合法权益，促进数据要素市场化流通...</p>
+                                    <button class="text-blue-400 hover:text-blue-300 font-medium">阅读更多 →</button>
+                                </div>
+                            </li>
+                            <li class="splide__slide">
+                                <div class="glass-card p-8 rounded-2xl">
+                                    <div class="text-sm text-green-400 mb-2">2024-11-15</div>
+                                    <h3 class="text-xl font-bold mb-4">平台注册用户突破3000大关</h3>
+                                    <p class="text-gray-300 mb-4">截至今日，天津数据产权登记服务平台注册用户已达到3240人，登记数据项超过15000个...</p>
+                                    <button class="text-green-400 hover:text-green-300 font-medium">查看详情 →</button>
+                                </div>
+                            </li>
+                            <li class="splide__slide">
+                                <div class="glass-card p-8 rounded-2xl">
+                                    <div class="text-sm text-purple-400 mb-2">2024-11-10</div>
+                                    <h3 class="text-xl font-bold mb-4">区块链技术在数据存证中的应用</h3>
+                                    <p class="text-gray-300 mb-4">平台正式引入区块链技术，确保数据产权信息的真实性和不可篡改性，提升平台可信度...</p>
+                                    <button class="text-purple-400 hover:text-purple-300 font-medium">技术解读 →</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer 容器 - 由组件动态加载 -->
+    <div id="footer-container"></div>
+
+    <!-- News Detail Modal -->
+    <div id="newsDetailModal" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50 flex items-center justify-center overflow-y-auto">
+        <div class="glass-card rounded-2xl max-w-3xl w-full mx-4 my-8 relative" style="background: rgba(15, 23, 42, 0.95);">
+            <!-- 关闭按钮 -->
+            <button onclick="closeNewsDetail()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+            
+            <!-- 加载状态 -->
+            <div id="newsLoading" class="hidden p-12 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <p class="text-gray-400">加载中...</p>
+            </div>
+            
+            <!-- 新闻内容 -->
+            <div id="newsContent" class="p-8">
+                <!-- 动态填充内容 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="glass-card p-8 rounded-2xl max-w-md w-full mx-4 relative">
+            <div class="text-center mb-6">
+                <h3 class="text-2xl font-bold mb-2">用户登录</h3>
+                <p class="text-gray-300">请使用账号密码登录</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <input type="text" id="loginPhone" value="13800138000" placeholder="手机号/账号" class="w-full bg-white bg-opacity-10 border border-white border-opacity-30 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500" required>
+                </div>
+                <div>
+                    <input type="password" id="loginPassword" value="123456" placeholder="密码" class="w-full bg-white bg-opacity-10 border border-white border-opacity-30 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500" required>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="rememberMe" class="mr-2">
+                    <label for="rememberMe" class="text-sm text-gray-300">记住我</label>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg transition-colors text-white font-medium">
+                    登录
+                </button>
+                <button type="button" onclick="window.location.href='user.html'" class="w-full text-gray-400 hover:text-white py-2 transition-colors">
+                    注册新账号
+                </button>
+            </form>
+            
+            <button onclick="hideLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth-check.js"></script>
+    <script src="main.js"></script>
+    <script>
+    // 登记按钮点击处理
+    async function handleRegisterClick() {
+        // 检查是否登录
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            alert('请先登录');
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        // 检查认证状态
+        try {
+            const response = await fetch('http://localhost:3002/api/verification/status', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const result = await response.json();
+            
+            if (result.success && result.data.verified) {
+                window.location.href = 'register.html';
+            } else {
+                alert('您尚未完成实名认证，请先完成认证后再进行数据产权登记');
+                window.location.href = 'user.html#verification';
+            }
+        } catch (error) {
+            console.error('检查认证状态失败:', error);
+            window.location.href = 'register.html';
+        }
+    }
+
+    // 初始化页面数据
+    async function initializePageData() {
+        console.log('[Index] 开始加载页面数据...');
+        // 页面加载完成后从API获取数据
+        try {
+            // 获取系统配置
+            const configResponse = await fetch('http://localhost:3002/api/site-config');
+            const configResult = await configResponse.json();
+            if (configResult.success) {
+                const config = configResult.data;
+                // 更新页面标题
+                if (config.siteName) {
+                    document.title = config.siteName;
+                    const siteTitle = document.getElementById('site-title');
+                    if (siteTitle) siteTitle.textContent = config.siteName;
+                }
+                // 更新网站描述
+                const siteDesc = document.getElementById('site-description');
+                if (siteDesc && config.siteDescription) {
+                    siteDesc.textContent = config.siteDescription;
+                }
+            }
+            
+            // 获取统计数据
+            console.log('[Index] 加载统计数据...');
+            const statsResult = await RegistrationAPI.getStats();
+            if (statsResult.success) {
+                const stats = statsResult.data;
+                console.log('[Index] 统计数据:', stats);
+                
+                // 更新统计数字
+                const statsNumbers = document.querySelectorAll('.stats-number');
+                if (statsNumbers.length >= 4) {
+                    // 登记数据项
+                    statsNumbers[0].setAttribute('data-count', stats.total_count || 0);
+                    // 注册用户
+                    statsNumbers[1].setAttribute('data-count', stats.userStats?.total_users || 0);
+                    // 成功率（审核通过率）
+                    const successRate = stats.total_count > 0 
+                        ? Math.round((stats.approved_count / stats.total_count) * 100) 
+                        : 0;
+                    statsNumbers[2].setAttribute('data-count', successRate);
+                    // 维权案例
+                    statsNumbers[3].setAttribute('data-count', stats.caseStats?.total_cases || 0);
+                    
+                    // 触发统计数字动画
+                    updateStatsAnimation();
+                }
+                
+                // 更新图表数据
+                updateChartsFromAPI(stats);
+            }
+            
+            // 获取新闻列表
+            console.log('[Index] 加载新闻列表...');
+            const newsResult = await NewsAPI.getList({ pageSize: 5 });
+            console.log('[Index] 新闻API返回:', newsResult);
+            if (newsResult.success && newsResult.data.list.length > 0) {
+                updateNewsCarousel(newsResult.data.list);
+                console.log(`[Index] 更新了 ${newsResult.data.list.length} 条新闻`);
+            } else {
+                console.warn('[Index] 新闻列表为空或加载失败');
+            }
+        } catch (error) {
+            console.error('[Index] 获取数据失败:', error);
+        }
+    }
+    
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', initializePageData);
+    
+    // 更新统计数字动画
+    function updateStatsAnimation() {
+        const statsNumbers = document.querySelectorAll('.stats-number');
+        statsNumbers.forEach(stat => {
+            const finalValue = parseInt(stat.getAttribute('data-count')) || 0;
+            animateCounter(stat, 0, finalValue, 2000);
+        });
+    }
+    
+    // 数字计数动画
+    function animateCounter(element, start, end, duration) {
+        const range = end - start;
+        const increment = range / (duration / 16);
+        let current = start;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= end) {
+                current = end;
+                clearInterval(timer);
+            }
+            element.textContent = Math.floor(current).toLocaleString();
+        }, 16);
+    }
+    
+    // 从API更新图表
+    function updateChartsFromAPI(stats) {
+        console.log('[Index] 更新图表数据...');
+        
+        // 类型映射
+        const nameMap = {
+            'financial': '金融数据',
+            'medical': '医疗数据',
+            'traffic': '交通数据',
+            'education': '教育数据',
+            'industrial': '工业数据',
+            'other': '其他数据'
+        };
+        const colorMap = {
+            'financial': '#3b82f6',
+            'medical': '#10b981',
+            'traffic': '#f59e0b',
+            'education': '#8b5cf6',
+            'industrial': '#ef4444',
+            'other': '#6b7280'
+        };
+        
+        // 更新数据类型分布图表
+        if (dataTypeChart && stats.categoryStats) {
+            console.log('[Index] 更新数据类型分布:', stats.categoryStats);
+            
+            // 如果有类型统计数据，使用API数据；否则使用默认数据
+            const categoryData = stats.categoryStats.length > 0 
+                ? stats.categoryStats.map(item => ({
+                    value: item.count,
+                    name: nameMap[item.category] || item.category,
+                    itemStyle: { color: colorMap[item.category] || '#6b7280' }
+                }))
+                : [
+                    { value: 0, name: '暂无数据', itemStyle: { color: '#6b7280' } }
+                ];
+            
+            dataTypeChart.setOption({
+                series: [{ data: categoryData }]
+            });
+        }
+        
+        // 更新日趋势图表（最近30天）
+        if (trendChart && stats.dailyTrend) {
+            console.log('[Index] 更新日趋势:', stats.dailyTrend);
+            
+            let dates, counts;
+            
+            if (stats.dailyTrend.length > 0) {
+                dates = stats.dailyTrend.map(item => {
+                    const date = new Date(item.date);
+                    return `${date.getMonth() + 1}/${date.getDate()}`;
+                });
+                counts = stats.dailyTrend.map(item => item.count);
+            } else {
+                // 如果没有数据，显示默认日期
+                dates = Array.from({length: 30}, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - (29 - i));
+                    return `${d.getMonth() + 1}/${d.getDate()}`;
+                });
+                counts = new Array(30).fill(0);
+            }
+            
+            trendChart.setOption({
+                xAxis: { 
+                    data: dates,
+                    axisLabel: {
+                        rotate: 45,
+                        interval: 4
+                    }
+                },
+                series: [
+                    { 
+                        name: '登记数量',
+                        data: counts,
+                        type: 'line',
+                        smooth: true,
+                        areaStyle: { color: 'rgba(59, 130, 246, 0.3)' },
+                        itemStyle: { color: '#3b82f6' }
+                    },
+                    { 
+                        name: '审核通过',
+                        data: counts.map(c => Math.round(c * 0.85)),
+                        type: 'line',
+                        smooth: true,
+                        areaStyle: { color: 'rgba(16, 185, 129, 0.3)' },
+                        itemStyle: { color: '#10b981' }
+                    }
+                ]
+            });
+        }
+    }
+    
+    // 全局轮播实例
+    let newsSplide = null;
+    
+    // 更新新闻轮播
+    function updateNewsCarousel(newsList) {
+        const carousel = document.querySelector('#news-carousel .splide__list');
+        if (!carousel || newsList.length === 0) {
+            console.warn('[Index] 轮播容器不存在或新闻列表为空');
+            return;
+        }
+        
+        console.log(`[Index] 更新新闻轮播，共 ${newsList.length} 条`);
+        
+        const categoryColors = {
+            '政策法规': 'text-blue-400',
+            '平台动态': 'text-green-400',
+            '技术动态': 'text-purple-400'
+        };
+        
+        // 销毁旧轮播实例
+        if (newsSplide) {
+            newsSplide.destroy();
+            newsSplide = null;
+        }
+        
+        carousel.innerHTML = newsList.map(news => `
+            <li class="splide__slide">
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="text-sm ${categoryColors[news.category] || 'text-blue-400'} mb-2">
+                        ${new Date(news.published_at).toLocaleDateString('zh-CN')}
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">${news.title}</h3>
+                    <p class="text-gray-300 mb-4">${news.summary || (news.content ? news.content.substring(0, 80) + '...' : '')}</p>
+                    <button class="text-blue-400 hover:text-blue-300 font-medium" onclick="showNewsDetail(${news.id})">阅读更多 →</button>
+                </div>
+            </li>
+        `).join('');
+        
+        // 重新初始化轮播
+        if (typeof Splide !== 'undefined') {
+            newsSplide = new Splide('#news-carousel', {
+                type: 'loop',
+                perPage: 3,
+                perMove: 1,
+                gap: '2rem',
+                autoplay: true,
+                interval: 5000,
+                breakpoints: {
+                    1024: { perPage: 2 },
+                    768: { perPage: 1 }
+                }
+            });
+            newsSplide.mount();
+            console.log('[Index] 新闻轮播已初始化');
+        }
+    }
+    
+    // 显示新闻详情（弹窗预览）
+    window.showNewsDetail = async function(newsId) {
+        console.log('[Index] 查看新闻详情, ID:', newsId);
+        
+        const modal = document.getElementById('newsDetailModal');
+        const loading = document.getElementById('newsLoading');
+        const content = document.getElementById('newsContent');
+        
+        // 显示弹窗
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // 禁用背景滚动
+        
+        // 显示加载状态
+        loading.classList.remove('hidden');
+        content.classList.add('hidden');
+        
+        try {
+            // 调用API获取新闻详情
+            const result = await NewsAPI.getDetail(newsId);
+            
+            if (result.success && result.data) {
+                const news = result.data;
+                const categoryColors = {
+                    '政策法规': 'text-blue-400 bg-blue-400/20',
+                    '平台动态': 'text-green-400 bg-green-400/20',
+                    '技术动态': 'text-purple-400 bg-purple-400/20'
+                };
+                const categoryClass = categoryColors[news.category] || 'text-gray-400 bg-gray-400/20';
+                
+                // 填充新闻内容
+                content.innerHTML = `
+                    <div class="mb-6">
+                        <span class="inline-block px-3 py-1 rounded-full text-sm font-medium ${categoryClass} mb-4">
+                            ${news.category || '新闻公告'}
+                        </span>
+                        <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">${news.title}</h2>
+                        <div class="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                ${news.author_name || '平台管理员'}
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                ${new Date(news.published_at).toLocaleDateString('zh-CN')}
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                                ${(news.view_count || 0) + 1} 次阅读
+                            </span>
+                        </div>
+                    </div>
+                    
+                    ${news.cover_image ? `
+                    <div class="mb-6 rounded-xl overflow-hidden">
+                        <img src="${news.cover_image}" alt="${news.title}" class="w-full h-auto object-cover max-h-80">
+                    </div>
+                    ` : ''}
+                    
+                    <div class="prose prose-invert max-w-none">
+                        <div class="text-gray-300 leading-relaxed whitespace-pre-wrap">${news.content}</div>
+                    </div>
+                    
+                    ${news.summary ? `
+                    <div class="mt-8 p-4 bg-blue-500/10 border-l-4 border-blue-500 rounded-r-lg">
+                        <p class="text-sm text-blue-300 font-medium mb-1">摘要</p>
+                        <p class="text-gray-400 text-sm">${news.summary}</p>
+                    </div>
+                    ` : ''}
+                `;
+                
+                // 隐藏加载状态，显示内容
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+            } else {
+                throw new Error(result.message || '获取新闻详情失败');
+            }
+        } catch (error) {
+            console.error('[Index] 获取新闻详情失败:', error);
+            loading.classList.add('hidden');
+            content.classList.remove('hidden');
+            content.innerHTML = `
+                <div class="text-center py-12">
+                    <svg class="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h3 class="text-xl font-bold text-red-400 mb-2">加载失败</h3>
+                    <p class="text-gray-400 mb-4">${error.message || '无法加载新闻内容'}</p>
+                    <button onclick="closeNewsDetail()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                        关闭
+                    </button>
+                </div>
+            `;
+        }
+    }
+    
+    // 关闭新闻详情弹窗
+    window.closeNewsDetail = function() {
+        const modal = document.getElementById('newsDetailModal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = ''; // 恢复背景滚动
+    }
+    
+    // 点击弹窗背景关闭
+    document.getElementById('newsDetailModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeNewsDetail();
+        }
+    });
+    
+    // ESC键关闭弹窗
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('newsDetailModal');
+            if (!modal.classList.contains('hidden')) {
+                closeNewsDetail();
+            }
+        }
+    });
+    
+    // 登录表单处理
+    document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const phone = document.getElementById('loginPhone').value;
+        const password = document.getElementById('loginPassword').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        
+        try {
+            const result = await AuthAPI.login(phone, password, rememberMe);
+            
+            if (result.success) {
+                alert('登录成功！');
+                // 根据角色跳转
+                if (result.data.user.role === 'admin') {
+                    window.location.href = 'http://localhost:3002/admin/';
+                } else {
+                    window.location.href = 'user.html';
+                }
+            } else {
+                alert(result.message || '登录失败');
+            }
+        } catch (error) {
+            console.error('登录错误:', error);
+            alert('登录失败: ' + error.message);
+        }
+    });
+    
+    // 布局初始化由simple-layout.js自动处理
+    </script>
+</body>
+</html>
