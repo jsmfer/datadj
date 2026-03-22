@@ -3,7 +3,7 @@
  * 封装所有与后端API的通信
  */
 
-const API_BASE_URL = 'http://localhost:3002/api';
+const API_BASE_URL = '/api';
 
 // API服务对象
 const ApiService = {

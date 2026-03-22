@@ -125,7 +125,7 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // 启动服务器
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`
 ╔════════════════════════════════════════════════════════════╗
 ║     天津数据产权登记服务平台 - 后端API服务                  ║

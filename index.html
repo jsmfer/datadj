@@ -413,7 +413,7 @@
         
         // 检查认证状态
         try {
-            const response = await fetch('http://localhost:3002/api/verification/status', {
+            const response = await fetch('/api/verification/status', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const result = await response.json();
@@ -436,7 +436,7 @@
         // 页面加载完成后从API获取数据
         try {
             // 获取系统配置
-            const configResponse = await fetch('http://localhost:3002/api/site-config');
+            const configResponse = await fetch('/api/site-config');
             const configResult = await configResponse.json();
             if (configResult.success) {
                 const config = configResult.data;
@@ -818,7 +818,7 @@
                 alert('登录成功！');
                 // 根据角色跳转
                 if (result.data.user.role === 'admin') {
-                    window.location.href = 'http://localhost:3002/admin/';
+                    window.location.href = '/admin/';
                 } else {
                     window.location.href = 'user.html';
                 }

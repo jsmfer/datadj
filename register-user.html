@@ -431,7 +431,7 @@
                 const user = ApiService.getCurrentUser();
                 if (user) {
                     if (user.role === 'admin') {
-                        window.location.href = 'http://localhost:3002/admin/';
+                        window.location.href = '/admin/';
                     } else {
                         window.location.href = 'user.html';
                     }

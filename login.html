@@ -198,7 +198,7 @@
                                 <span class="px-2 bg-gray-800 text-gray-400 rounded">测试账号</span>
                             </div>
                         </div>
-                        <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                        <!-- <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
                             <button onclick="fillTestAccount('13800138000', '123456')" class="glass-card py-2 px-3 rounded-lg hover:bg-white hover:bg-opacity-10 transition-colors text-left">
                                 <div class="font-medium">普通用户</div>
                                 <div class="text-gray-400 text-xs">13800138000 / 123456</div>
@@ -207,7 +207,7 @@
                                 <div class="font-medium">管理员</div>
                                 <div class="text-gray-400 text-xs">admin / admin123</div>
                             </button>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -334,7 +334,7 @@
                     setTimeout(() => {
                         const user = result.data.user;
                         if (user.role === 'admin') {
-                            window.location.href = 'http://localhost:3002/admin/';
+                            window.location.href = '/admin/';
                         } else {
                             window.location.href = 'user.html';
                         }
@@ -360,7 +360,7 @@
                 const user = ApiService.getCurrentUser();
                 if (user) {
                     if (user.role === 'admin') {
-                        window.location.href = 'http://localhost:3002/admin/';
+                        window.location.href = '/admin/';
                     } else {
                         window.location.href = 'user.html';
                     }

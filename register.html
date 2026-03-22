@@ -1216,7 +1216,7 @@
                     }
                     
                     try {
-                        const uploadResponse = await fetch(`http://localhost:3002/api/upload/${registrationId}`, {
+                        const uploadResponse = await fetch(`/api/upload/${registrationId}`, {
                             method: 'POST',
                             headers: {
                                 'Authorization': `Bearer ${token}`
